@@ -15,7 +15,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 # Directories
 root = os.path.dirname(__file__)
 model_folder = os.path.join(root,"model")
-data_dir = os.path.join(root,"data")
+data_dir = os.path.join(root,"data/fma_8000")
 # json_dir = os.path.join(root,"data/fma_10k.json")
 ir_dir = os.path.join(root,'data/augmentation_datasets/ir_filters')
 noise_dir = os.path.join(root,'data/augmentation_datasets/noise')
@@ -97,11 +97,11 @@ def main():
     sample_rate = args.sr
     random_seed = 42
 
-    sub_dir = create_train_set(data_dir)
-    print(sub_dir)
-    assert sub_dir == os.path.join(root,"data/fma_8000") and len(os.listdir(sub_dir)) == int(sub_dir.split('_')[-1])
+    # sub_dir = create_train_set(data_dir)
+    # print(sub_dir)
+    # assert sub_dir == os.path.join(root,"data/fma_8000") and len(os.listdir(sub_dir)) == int(sub_dir.split('_')[-1])
 
-    train_dataset = NeuralfpDataset(path=sub_dir, transform=TransformNeuralfp(ir_dir=ir_dir, noise_dir=noise_dir,sample_rate=sample_rate), train=True)
+    train_dataset = NeuralfpDataset(path=data_dir, transform=TransformNeuralfp(ir_dir=ir_dir, noise_dir=noise_dir,sample_rate=sample_rate), train=True)
     # validation_dataset = NeuralfpDataset(path=data_dir, transform=TransformNeuralfp(ir_dir=ir_dir, noise_dir=noise_dir,sample_rate=sample_rate), train=True)
 
     # dataset_size = len(train_dataset)
