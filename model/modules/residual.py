@@ -14,7 +14,7 @@ class ResidualUnit(nn.Module):
             kernels = [[1,1],[1,3],[1,1]]
 
         self.conv1 = nn.Sequential(
-                        nn.Conv2d(inplanes, channels[1], kernel_size = kernels[0], stride = [1,strides[0]], padding = [kernels[0][0] // 2 ,0]),
+                        nn.Conv2d(inplanes, channels[1], kernel_size = kernels[0], stride = [1,strides[0]], padding = [int(kernels[0][0] / 2) ,0]),
                         nn.BatchNorm2d(channels[1]),
                         nn.ReLU())
         self.conv2 = nn.Sequential(
@@ -61,7 +61,7 @@ class FuseFastToSlow(nn.Module):
             dim_in * fusion_conv_channel_ratio,
             kernel_size=[fusion_kernel, 1],
             stride=[alpha, 1],
-            padding=[fusion_kernel // 2, 0]
+            padding=[int(fusion_kernel / 2), 0]
         )
         self.bn = nn.BatchNorm2d(dim_in * fusion_conv_channel_ratio)
         self.relu = nn.ReLU()
