@@ -66,6 +66,7 @@ class NeuralfpDataset(Dataset):
             clip = audio_resampled[r:r+offset_mod]
             org = clip[ri:ri+clip_frames]
             rep = clip[rj:rj+clip_frames]
+            print(f"In data.py... {type(rep)}")
             
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
