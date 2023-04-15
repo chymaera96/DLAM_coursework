@@ -17,7 +17,7 @@ class TransformNeuralfp:
         #     ])
         
         self.train_transform_j = Compose([
-            ApplyImpulseResponse(ir_path=self.ir_dir, p=0.5),
+            ApplyImpulseResponse(ir_path=self.ir_dir, p=0.5, leave_length_unchanged=True),
             AddBackgroundNoise(sounds_path=noise_dir, min_snr_in_db=0, max_snr_in_db=20,p=0.8),
 
             ])
@@ -45,4 +45,6 @@ class TransformNeuralfp:
             
     def __call__(self, x_i, x_j):
         # x_j = self.irconv(x_j, p=0.8)
-        return x_i, self.train_transform_j(x_j, sample_rate=self.sample_rate)
+        x_j = self.train_transform_j(x_j, sample_rate=self.sample_rate)
+        print(f"In transformations ... {x_i.shape, x_j.shape}")
+        return x_i, x_j
