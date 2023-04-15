@@ -4,6 +4,7 @@ import librosa
 import numpy as np
 import json
 import glob
+import shutil
 
 def load_index(data_dir, ext=['wav','mp3']):
     dataset = {}
@@ -41,3 +42,14 @@ def save_ckp(state,epoch,model_name,model_folder):
     if not os.path.exists(model_folder): 
         os.mkdir(model_folder)
     torch.save(state, "{}/model_{}_epoch_{}.pth".format(model_folder,model_name,epoch))
+
+
+def create_train_set(data_dir, size=8000):
+    dest = os.path.join(data_dir, f'fma_{size}')
+    if not os.path.exists(dest):
+        os.mkdir(dest)
+    for ix,fpath in enumerate(glob.iglob(f"{data_dir}/**/*.mp3", recursive=True)):
+        if ix <= 8000:
+            shutil.move(fpath,dest)
+    
+    return dest

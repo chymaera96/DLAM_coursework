@@ -4,7 +4,7 @@ import argparse
 import torch
 import torch.nn.functional as F
 
-from util import load_ckp, save_ckp
+from util import load_ckp, save_ckp, create_train_set
 from model.transformations import TransformNeuralfp
 from model.data import NeuralfpDataset
 from model.modules.simclr import SimCLR
@@ -15,10 +15,10 @@ from torch.utils.data.sampler import SubsetRandomSampler
 # Directories
 root = os.path.dirname(__file__)
 model_folder = os.path.join(root,"model")
-data_dir = os.path.join(root,"data/fma_10k")
+data_dir = os.path.join(root,"data")
 # json_dir = os.path.join(root,"data/fma_10k.json")
-ir_dir = os.path.join(root,'data/ir_filters')
-noise_dir = os.path.join(root,'data/noise')
+ir_dir = os.path.join(root,'data/augmentation_datasets/ir_filters')
+noise_dir = os.path.join(root,'data/augmentation_datasets/noise')
 
 device = torch.device("cuda")
 
@@ -34,7 +34,7 @@ parser.add_argument('--sr', default=16000, type=int,
                     help='Sampling rate ')
 
 
-def ntxent_loss(z_i, z_j, tau):
+def ntxent_loss(z_i, z_j, tau=0.05):
     """
     NTXent Loss function.
     Parameters
@@ -60,7 +60,7 @@ def ntxent_loss(z_i, z_j, tau):
     loss = torch.sum(Ls) / -z.shape[0]
     return loss
 
-def train(train_loader, model, optimizer, criterion):
+def train(train_loader, model, optimizer):
     loss_epoch = 0
     for idx, (x_i, x_j) in enumerate(train_loader):
 
@@ -70,7 +70,7 @@ def train(train_loader, model, optimizer, criterion):
 
         # positive pair, with encoding
         h_i, h_j, z_i, z_j = model(x_i, x_j)
-        loss = criterion(z_i, z_j)
+        loss = ntxent_loss(z_i, z_j)
 
         # if torch.count_nonzero(torch.isnan(loss)) > 0:
         #     print(z_i)
@@ -93,16 +93,38 @@ def main():
     # Hyperparameters
     batch_size = 250
     learning_rate = 1e-4
-    validation_split = 0.2
-    shuffle_dataset = True
     num_epochs = args.epochs
     sample_rate = args.sr
+    random_seed = 42
+
+    data_dir = create_train_set(data_dir)
+    assert data_dir == os.path.join(root,"data/fma_8000") and len(os.listdir(data_dir)) == int(data_dir.split('_')[-1])
 
     train_dataset = NeuralfpDataset(path=data_dir, transform=TransformNeuralfp(ir_dir=ir_dir, noise_dir=noise_dir,sample_rate=sample_rate), train=True)
+    # validation_dataset = NeuralfpDataset(path=data_dir, transform=TransformNeuralfp(ir_dir=ir_dir, noise_dir=noise_dir,sample_rate=sample_rate), train=True)
+
+    # dataset_size = len(train_dataset)
+    # indices = list(range(dataset_size))
+    # split = int(np.floor(validation_split * dataset_size))
+    # if shuffle_dataset :
+    #     np.random.seed(random_seed)
+    #     np.random.shuffle(indices)
+    # train_indices, val_indices = indices[split:], indices[:split]
+
+    # train_sampler = SubsetRandomSampler(train_indices)
+    # valid_sampler = SubsetRandomSampler(val_indices)
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=batch_size, shuffle=True,
         num_workers=4, pin_memory=True, drop_last=True)
+        # sampler=train_sampler)
+    
+    # validation_loader = torch.utils.data.DataLoader(
+    #     validation_dataset, batch_size=1, shuffle=False,
+    #     num_workers=4, pin_memory=True,
+    #     sampler=valid_sampler)
+    
+    
     
     model = SimCLR(encoder=SlowFastNetwork(ResidualUnit, layers=[2,2,2,2]))
     # model = nn.DataParallel(model).to(device)
@@ -122,3 +144,30 @@ def main():
     else:
         start_epoch = 0
         loss_log = []
+
+    
+    best_loss = train(train_loader, model, optimizer)
+
+    # training
+    model.train()
+    for epoch in range(start_epoch+1, num_epochs+1):
+        print("#######Epoch {}#######".format(epoch))
+        loss_epoch = train(train_loader, model, optimizer)
+        loss_log.append(loss_epoch)
+        if loss_epoch < best_loss and epoch%10==0:
+            best_loss = loss_epoch
+            
+            checkpoint = {
+                'epoch': epoch,
+                'loss': loss_log,
+                'state_dict': model.state_dict(),
+                'optimizer': optimizer.state_dict(),
+                'scheduler': scheduler.state_dict()
+            }
+            save_ckp(checkpoint,epoch)
+        scheduler.step()
+    
+  
+        
+if __name__ == '__train__':
+    main()
