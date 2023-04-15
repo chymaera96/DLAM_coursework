@@ -80,8 +80,8 @@ class NeuralfpDataset(Dataset):
             # x_i = torch.from_numpy(x_i)
             # x_j = torch.from_numpy(x_j)
             
-            print(f"{x_i} x_i.shape")
-            print(x_j.shape)
+            # print(f"{x_i} x_i.shape")
+            # print(x_j.shape)
             X_i = spec(x_i)
             X_i = torchaudio.transforms.AmplitudeToDB()(X_i)
             X_i = F.pad(X_i, (self.n_frames - X_i.size(-1), 0))
