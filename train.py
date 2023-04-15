@@ -98,7 +98,7 @@ def main():
     random_seed = 42
 
     sub_dir = create_train_set(data_dir)
-    print(sub_dir, len(sub_dir))
+    print(sub_dir, len(os.listdir(sub_dir)))
     assert sub_dir == os.path.join(root,"data/fma_8000") and len(os.listdir(sub_dir)) == int(sub_dir.split('_')[-1])
 
     train_dataset = NeuralfpDataset(path=sub_dir, transform=TransformNeuralfp(ir_dir=ir_dir, noise_dir=noise_dir,sample_rate=sample_rate), train=True)
