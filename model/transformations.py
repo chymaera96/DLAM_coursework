@@ -1,4 +1,4 @@
-from audiomentations import Compose,FrequencyMask,TimeMask,AddBackgroundNoise
+from torch_audiomentations import Compose,FrequencyMask,TimeMask,AddBackgroundNoise, ApplyImpulseResponse
 import numpy as np
 import os
 import random
@@ -16,7 +16,7 @@ class TransformNeuralfp:
             ])
         
         self.train_transform_j = Compose([
-            # AddImpulseResponse(ir_path=ir_dir, p=0.8),
+            ApplyImpulseResponse(ir_path=ir_dir, p=0.8, sample_rate=self.sample_rate),
             FrequencyMask(min_frequency_band=0.1, max_frequency_band=0.5,p=0.8),
             TimeMask(min_band_part=0.1, max_band_part=0.5),
             # ClippingDistortion(min_percentile_threshold=0, max_percentile_threshold=10),
@@ -45,5 +45,5 @@ class TransformNeuralfp:
         return x_aug.astype(np.float32)
             
     def __call__(self, x_i, x_j):
-        x_j = self.irconv(x_j, p=0.8)
+        # x_j = self.irconv(x_j, p=0.8)
         return self.train_transform_i(x_i, sample_rate=self.sample_rate), self.train_transform_j(x_j, sample_rate=self.sample_rate)
