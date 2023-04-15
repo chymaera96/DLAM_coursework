@@ -6,7 +6,10 @@ import torch.nn.functional as F
 import torchaudio
 import numpy as np
 import warnings
-from torchaudio.transforms import MelSpectrogram
+from torchaudio.transforms import MelSpectrogram, TimeMasking, FrequencyMasking
+import torch.nn as nn
+
+
 from util import load_index, get_frames, qtile_normalize
 
 clip_len = 2.0
@@ -21,6 +24,10 @@ class NeuralfpDataset(Dataset):
         self.offset = offset 
         self.n_frames = n_frames
         self.filenames = load_index(path)
+        self.spec_aug = nn.Sequential(
+            TimeMasking(time_mask_param=80),
+            FrequencyMasking(freq_mask_param=64)
+)
 
         self.ignore_idx = []
   
@@ -66,21 +73,23 @@ class NeuralfpDataset(Dataset):
             clip = audio_resampled[r:r+offset_mod]
             org = clip[ri:ri+clip_frames]
             rep = clip[rj:rj+clip_frames]
-            print(f"In data.py... {type(rep)}")
             
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                x_i, x_j = self.transform(org.numpy(), rep.numpy())
-            x_i = torch.from_numpy(x_i)
-            x_j = torch.from_numpy(x_j)
+                x_i, x_j = self.transform(org, rep)
+            # x_i = torch.from_numpy(x_i)
+            # x_j = torch.from_numpy(x_j)
     
             X_i = spec(x_i)
             X_i = torchaudio.transforms.AmplitudeToDB()(X_i)
             X_i = F.pad(X_i, (self.n_frames - X_i.size(-1), 0))
+            X_i = self.spec_aug(X_i)
     
             X_j = spec(x_j)
             X_j = torchaudio.transforms.AmplitudeToDB()(X_j)
             X_j = F.pad(X_j, (self.n_frames - X_j.size(-1), 0))
+            X_i = self.spec_aug(X_j)
+
 
             return torch.unsqueeze(X_i, 0), torch.unsqueeze(X_j, 0)
         

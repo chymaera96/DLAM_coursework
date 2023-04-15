@@ -1,5 +1,4 @@
 from torch_audiomentations import Compose,AddBackgroundNoise, ApplyImpulseResponse
-from torchaudio.transforms import TimeMasking, FrequencyMasking
 import numpy as np
 import os
 import random
@@ -23,10 +22,6 @@ class TransformNeuralfp:
 
             ])
         
-        self.spec_aug = nn.Sequential(
-            TimeMasking(time_mask_param=80),
-            FrequencyMasking(freq_mask_param=64)
-        )
     def irconv(self, x, p):
         ir_dir = self.ir_dir
         if random.random() < p:
@@ -50,7 +45,4 @@ class TransformNeuralfp:
             
     def __call__(self, x_i, x_j):
         # x_j = self.irconv(x_j, p=0.8)
-        print(x_i.shape)
-        x_i = self.spec_aug(x_i)
-        x_j = self.spec_aug(x_j)
         return x_i, self.train_transform_j(x_j, sample_rate=self.sample_rate)
