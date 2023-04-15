@@ -106,6 +106,7 @@ def main():
     print(noise_dir)
     assert data_dir == os.path.join(root,"data/fma_8000")
 
+    print("Loading dataset...")
     train_dataset = NeuralfpDataset(path=data_dir, transform=TransformNeuralfp(ir_dir=ir_dir, noise_dir=noise_dir,sample_rate=sample_rate), train=True)
     # validation_dataset = NeuralfpDataset(path=data_dir, transform=TransformNeuralfp(ir_dir=ir_dir, noise_dir=noise_dir,sample_rate=sample_rate), train=True)
 
@@ -131,7 +132,7 @@ def main():
     #     sampler=valid_sampler)
     
     
-    
+    print("Creating new model...")
     model = SimCLR(encoder=SlowFastNetwork(ResidualUnit, layers=[1,1,1,1])).to(device)
     # model = nn.DataParallel(model).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -151,7 +152,7 @@ def main():
         start_epoch = 0
         loss_log = []
 
-    
+    print("Calculating initial loss ...")
     best_loss = train(train_loader, model, optimizer)
 
     # training
