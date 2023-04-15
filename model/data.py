@@ -45,7 +45,7 @@ class NeuralfpDataset(Dataset):
         # print(f"audio length ----> {len(audioData)}")
         resampler = torchaudio.transforms.Resample(sr, SAMPLE_RATE)
         audio_resampled = resampler(audio_mono)    # Downsampling
-        spec = MelSpectrogram(sample_rate=SAMPLE_RATE, win_length=270, hop_length=135, n_fft=270, n_mels=128)    
+        spec = MelSpectrogram(sample_rate=SAMPLE_RATE, win_length=540, hop_length=135, n_fft=540, n_mels=128)    
 
         clip_frames = int(SAMPLE_RATE*clip_len)
         
@@ -57,7 +57,7 @@ class NeuralfpDataset(Dataset):
         #   For training pipeline, output augmented spectrograms of a random frame of the audio
         if self.train:
             offset_mod = int(SAMPLE_RATE*(clip_frames+self.offset))
-            if len(audio_resampled) > offset_mod:
+            if len(audio_resampled) < offset_mod:
                 print(len(audio_resampled), sr)
             r = np.random.randint(0,len(audio_resampled)-offset_mod)
             ri = np.random.randint(0,offset_mod - clip_frames)
