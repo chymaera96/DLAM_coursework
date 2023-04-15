@@ -1,9 +1,9 @@
-from torch_audiomentations import Compose,AddBackgroundNoise, ApplyImpulseResponse
+# from torch_audiomentations import Compose,AddBackgroundNoise, ApplyImpulseResponse
+from audiomentations import Compose,AddBackgroundNoise, ApplyImpulseResponse
 import numpy as np
 import os
 import random
 import librosa
-import torch.nn as nn
 
 class TransformNeuralfp:
     
@@ -17,8 +17,8 @@ class TransformNeuralfp:
         #     ])
         
         self.train_transform_j = Compose([
-            ApplyImpulseResponse(ir_paths=ir_dir, p=0.5, sample_rate=self.sample_rate),
-            AddBackgroundNoise(background_paths=noise_dir, min_snr_in_db=0, max_snr_in_db=20,p=0.8),
+            ApplyImpulseResponse(ir_path=ir_dir, p=0.5, sample_rate=self.sample_rate),
+            AddBackgroundNoise(sound_path=noise_dir, min_snr_in_db=0, max_snr_in_db=20,p=0.8),
 
             ])
         
