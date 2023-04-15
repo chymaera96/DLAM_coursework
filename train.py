@@ -129,7 +129,7 @@ def main():
     
     
     
-    model = SimCLR(encoder=SlowFastNetwork(ResidualUnit, layers=[2,2,2,2]))
+    model = SimCLR(encoder=SlowFastNetwork(ResidualUnit, layers=[1,1,1,1]))
     # model = nn.DataParallel(model).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
