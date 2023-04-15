@@ -5,6 +5,8 @@ from torch.utils.data import Dataset
 import torch.nn.functional as F
 import torchaudio
 import numpy as np
+import librosa
+from librosa.feature import melspectrogram
 import warnings
 from torchaudio.transforms import MelSpectrogram, TimeMasking, FrequencyMasking
 import torch.nn as nn
@@ -38,7 +40,7 @@ class NeuralfpDataset(Dataset):
         
         datapath = self.filenames[str(idx)]
         try:
-            audio, sr = torchaudio.load(datapath)
+            audio, sr = librosa.load(datapath, sr=SAMPLE_RATE)
 
         except Exception:
 
@@ -47,17 +49,17 @@ class NeuralfpDataset(Dataset):
             # self.filenames.pop(str(idx))
             return self[idx+1]
 
-        audio_mono = audio.mean(dim=0)
+        # audio_mono = audio.mean(dim=0)
         if self.norm is not None:
-            audio_mono = qtile_normalize(audio_mono, q=self.norm)
+            audio_mono = qtile_normalize(audio, q=self.norm)
         # print(f"audio length ----> {len(audioData)}")
-        resampler = torchaudio.transforms.Resample(sr, SAMPLE_RATE)
-        audio_resampled = resampler(audio_mono)    # Downsampling
+        # resampler = torchaudio.transforms.Resample(sr, SAMPLE_RATE)
+        # audio_resampled = resampler(audio_mono)    # Downsampling
         spec = MelSpectrogram(sample_rate=22050, win_length=740, hop_length=185, n_fft=740, n_mels=128)      
 
         clip_frames = int(SAMPLE_RATE*clip_len)
         
-        if len(audio_resampled) <= clip_frames:
+        if len(audio_mono) <= clip_frames:
             self.ignore_idx.append(idx)
             # self.filenames.pop(str(idx))
             return self[idx + 1]
@@ -65,29 +67,30 @@ class NeuralfpDataset(Dataset):
         #   For training pipeline, output augmented spectrograms of a random frame of the audio
         if self.train:
             offset_mod = int(SAMPLE_RATE*(self.offset) + clip_frames)
-            if len(audio_resampled) < offset_mod:
-                print(len(audio_resampled), offset_mod)
-            r = np.random.randint(0,len(audio_resampled)-offset_mod)
+            if len(audio_mono) < offset_mod:
+                print(len(audio_mono), offset_mod)
+            r = np.random.randint(0,len(audio_mono)-offset_mod)
             ri = np.random.randint(0,offset_mod - clip_frames)
             rj = np.random.randint(0,offset_mod - clip_frames)
-            clip = audio_resampled[r:r+offset_mod]
+            clip = audio_mono[r:r+offset_mod]
             org = clip[ri:ri+clip_frames]
             rep = clip[rj:rj+clip_frames]
             
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
                 x_i, x_j = self.transform(org, rep)
-            # x_i = torch.from_numpy(x_i)
-            # x_j = torch.from_numpy(x_j)
+
             
             # print(f"{x_i} x_i.shape")
             # print(x_j.shape)
-            X_i = spec(x_i)
+            X_i = melspectrogram(y=x_i, sr=SAMPLE_RATE, win_length=740, hop_length=185, n_fft=740, n_mels=128)
+            X_i = torch.from_numpy(X_i)
             X_i = torchaudio.transforms.AmplitudeToDB()(X_i)
             X_i = F.pad(X_i, (self.n_frames - X_i.size(-1), 0))
             X_i = self.spec_aug(X_i)
     
-            X_j = spec(x_j)
+            X_j = melspectrogram(y=x_j, sr=SAMPLE_RATE, win_length=740, hop_length=185, n_fft=740, n_mels=128)
+            X_j = torch.from_numpy(X_j)
             X_j = torchaudio.transforms.AmplitudeToDB()(X_j)
             X_j = F.pad(X_j, (self.n_frames - X_j.size(-1), 0))
             X_i = self.spec_aug(X_j)
@@ -99,7 +102,7 @@ class NeuralfpDataset(Dataset):
         else:
             frame_length = int(SAMPLE_RATE*1.0)
             hop_length = int(SAMPLE_RATE*1.0/2)
-            framed_audio = get_frames(audio_resampled, frame_length, hop_length)
+            framed_audio = get_frames(audio_mono, frame_length, hop_length)
             list_of_specs = []
             for frame in framed_audio:
                 X = spec(frame)
