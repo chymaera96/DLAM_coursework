@@ -7,7 +7,7 @@ import torchaudio
 import numpy as np
 import warnings
 from torchaudio.transforms import MelSpectrogram
-from util import load_index, get_frames, qtile_nomalize
+from util import load_index, get_frames, qtile_normalize
 
 clip_len = 2.0
 SAMPLE_RATE = 16000
@@ -40,7 +40,7 @@ class NeuralfpDataset(Dataset):
 
         audio_mono = audio.mean(dim=0)
         if self.norm is not None:
-            audio_mono = qtile_nomalize(audio_mono, q=self.norm)
+            audio_mono = qtile_normalize(audio_mono, q=self.norm)
         # print(f"audio length ----> {len(audioData)}")
         resampler = torchaudio.transforms.Resample(sr, SAMPLE_RATE)
         audio_resampled = resampler(audio_mono)    # Downsampling
