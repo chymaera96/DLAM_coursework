@@ -50,7 +50,7 @@ class NeuralfpDataset(Dataset):
             # self.filenames.pop(str(idx))
             return self[idx+1]
 
-        # audio_mono = audio.mean(dim=0)
+        audio_mono = audio.mean(dim=0)
         if self.norm is not None:
             audio_mono = qtile_normalize(audio_mono, q=self.norm)
         # print(f"audio length ----> {len(audioData)}")
