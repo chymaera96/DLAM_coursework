@@ -17,7 +17,7 @@ class TransformNeuralfp:
         #     ])
         
         self.train_transform_j = Compose([
-            ApplyImpulseResponse(ir_path=ir_dir, p=0.5, sample_rate=self.sample_rate),
+            ApplyImpulseResponse(ir_path=self.ir_dir, p=0.5),
             AddBackgroundNoise(sound_path=noise_dir, min_snr_in_db=0, max_snr_in_db=20,p=0.8),
 
             ])
