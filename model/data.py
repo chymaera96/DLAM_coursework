@@ -41,7 +41,7 @@ class NeuralfpDataset(Dataset):
         
         datapath = self.filenames[str(idx)]
         try:
-            audio = torchaudio.load(datapath)
+            audio, sr = torchaudio.load(datapath)
 
         except Exception:
 
