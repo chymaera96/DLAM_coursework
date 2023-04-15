@@ -44,20 +44,22 @@ def save_ckp(state,epoch,model_name,model_folder):
 
 
 def create_train_set(data_dir, size=8000):
-    src_dir = os.path.join(data_dir, f'fma_{size}')
-    # if not os.path.exists(dest):
-    #     os.mkdir(dest)
-    # for ix,fpath in enumerate(glob.iglob(f"{data_dir}/**/*.mp3", recursive=True)):
-    #     if ix <= 8000:
-    #         shutil.move(fpath,dest)
-    source_dir = os.path.join(data_dir, f'fma_{size}')
-    target_dir = data_dir
+    dest = os.path.join(data_dir, f'fma_{size}')
+    if not os.path.exists(dest):
+        os.mkdir(dest)
+    if len(os.listdir(dest)) >= 8000:
+        return dest
+    for ix,fname in enumerate(os.listdir(data_dir)):
+        fpath = os.path.join(data_dir, fname)
+        if ix <= 8000 and fpath.endswith('mp3'):
+            shutil.move(fpath,dest)
+    # source_dir = os.path.join(data_dir, f'fma_{size}')
+    # target_dir = data_dir
         
-    file_names = os.listdir(source_dir)
+    # file_names = os.listdir(source_dir)
         
-    for file_name in file_names:
-        shutil.move(os.path.join(source_dir, file_name), target_dir)
-
+    # for file_name in file_names:
+    #     shutil.move(os.path.join(source_dir, file_name), target_dir)
 
     
-    return source_dir,target_dir
+    return dest
