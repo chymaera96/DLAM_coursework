@@ -50,6 +50,7 @@ class TransformNeuralfp:
             
     def __call__(self, x_i, x_j):
         # x_j = self.irconv(x_j, p=0.8)
+        print(x_i.shape)
         x_i = self.spec_aug(x_i)
         x_j = self.spec_aug(x_j)
         return x_i, self.train_transform_j(x_j, sample_rate=self.sample_rate)
