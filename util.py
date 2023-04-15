@@ -45,10 +45,15 @@ def save_ckp(state,epoch,model_name,model_folder):
 
 def create_train_set(data_dir, size=8000):
     dest = os.path.join(data_dir, f'fma_{size}')
-    if not os.path.exists(dest):
-        os.mkdir(dest)
-    for ix,fpath in enumerate(glob.iglob(f"{data_dir}/**/*.mp3", recursive=True)):
-        if ix <= 8000:
-            shutil.move(fpath,dest)
+    # if not os.path.exists(dest):
+    #     os.mkdir(dest)
+    # for ix,fpath in enumerate(glob.iglob(f"{data_dir}/**/*.mp3", recursive=True)):
+    #     if ix <= 8000:
+    #         shutil.move(fpath,dest)
+    for ix,fname in enumerate(os.listdir(data_dir)):
+        fpath = os.path.join(dest,fname)
+        if fpath.endswith('mp3') and not os.path.exists(fpath):
+            print(f'{fname}_does not exist')
+
     
     return dest
