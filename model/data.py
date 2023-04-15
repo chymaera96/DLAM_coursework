@@ -41,9 +41,7 @@ class NeuralfpDataset(Dataset):
         
         datapath = self.filenames[str(idx)]
         try:
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                audio, = torchaudio.load(datapath)
+            audio = torchaudio.load(datapath)
 
         except Exception:
 
