@@ -93,7 +93,8 @@ class NeuralfpDataset(Dataset):
             X_j = spec(x_j)
             X_j = torchaudio.transforms.AmplitudeToDB()(X_j)
             X_j = F.pad(X_j, (self.n_frames - X_j.size(-1), 0))
-            X_i = self.spec_aug(X_j)
+            X_j = self.spec_aug(X_j)
+            print(X_j.shape)
 
 
             return torch.unsqueeze(X_i, 0), torch.unsqueeze(X_j, 0)
