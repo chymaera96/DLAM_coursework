@@ -32,6 +32,8 @@ class NeuralfpDataset(Dataset):
         datapath = self.filenames[str(idx)]
         try:
             audio, sr = torchaudio.load(datapath)
+            print(sr)
+            return
         except Exception:
 
             print("Error loading:" + self.filenames[str(idx)])
