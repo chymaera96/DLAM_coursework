@@ -30,7 +30,7 @@ parser.add_argument('--resume', default='', type=str, metavar='PATH',
                     help='path to latest checkpoint (default: none)')
 parser.add_argument('--seed', default=None, type=int,
                     help='seed for initializing training. ')
-parser.add_argument('--sr', default=16000, type=int,
+parser.add_argument('--sr', default=22050, type=int,
                     help='Sampling rate ')
 
 

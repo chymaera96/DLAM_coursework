@@ -10,7 +10,7 @@ from torchaudio.transforms import MelSpectrogram
 from util import load_index, get_frames, qtile_normalize
 
 clip_len = 2.0
-SAMPLE_RATE = 16000
+SAMPLE_RATE = 22050
 
 class NeuralfpDataset(Dataset):
     def __init__(self, path, n_frames=240, offset=0.2, norm=0.95, transform=None, train=False):
@@ -32,8 +32,7 @@ class NeuralfpDataset(Dataset):
         datapath = self.filenames[str(idx)]
         try:
             audio, sr = torchaudio.load(datapath)
-            print(sr)
-            return
+
         except Exception:
 
             print("Error loading:" + self.filenames[str(idx)])
@@ -47,7 +46,7 @@ class NeuralfpDataset(Dataset):
         # print(f"audio length ----> {len(audioData)}")
         resampler = torchaudio.transforms.Resample(sr, SAMPLE_RATE)
         audio_resampled = resampler(audio_mono)    # Downsampling
-        spec = MelSpectrogram(sample_rate=SAMPLE_RATE, win_length=540, hop_length=135, n_fft=540, n_mels=128)    
+        spec = MelSpectrogram(sample_rate=22050, win_length=740, hop_length=185, n_fft=740, n_mels=128)      
 
         clip_frames = int(SAMPLE_RATE*clip_len)
         
