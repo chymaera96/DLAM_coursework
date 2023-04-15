@@ -10,6 +10,7 @@ from librosa.feature import melspectrogram
 import warnings
 from torchaudio.transforms import MelSpectrogram, TimeMasking, FrequencyMasking
 import torch.nn as nn
+import warnings
 
 
 from util import load_index, get_frames, qtile_normalize
@@ -40,7 +41,9 @@ class NeuralfpDataset(Dataset):
         
         datapath = self.filenames[str(idx)]
         try:
-            audio, sr = librosa.load(datapath, sr=SAMPLE_RATE)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                audio, sr = librosa.load(datapath, sr=SAMPLE_RATE)
 
         except Exception:
 
