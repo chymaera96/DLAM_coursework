@@ -1,4 +1,4 @@
-from audiomentations import Compose,AddImpulseResponse,FrequencyMask,TimeMask,AddBackgroundNoise
+from audiomentations import Compose,FrequencyMask,TimeMask,AddBackgroundNoise
 import numpy as np
 import os
 import random
@@ -16,7 +16,7 @@ class TransformNeuralfp:
             ])
         
         self.train_transform_j = Compose([
-            AddImpulseResponse(ir_path=ir_dir, p=0.8),
+            # AddImpulseResponse(ir_path=ir_dir, p=0.8),
             FrequencyMask(min_frequency_band=0.1, max_frequency_band=0.5,p=0.8),
             TimeMask(min_band_part=0.1, max_band_part=0.5),
             # ClippingDistortion(min_percentile_threshold=0, max_percentile_threshold=10),
