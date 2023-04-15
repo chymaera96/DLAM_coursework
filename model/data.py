@@ -56,9 +56,9 @@ class NeuralfpDataset(Dataset):
         
         #   For training pipeline, output augmented spectrograms of a random frame of the audio
         if self.train:
-            offset_mod = int(SAMPLE_RATE*(clip_frames+self.offset))
+            offset_mod = int(SAMPLE_RATE*(self.offset) + clip_frames)
             if len(audio_resampled) < offset_mod:
-                print(len(audio_resampled), sr)
+                print(len(audio_resampled), offset_mod)
             r = np.random.randint(0,len(audio_resampled)-offset_mod)
             ri = np.random.randint(0,offset_mod - clip_frames)
             rj = np.random.randint(0,offset_mod - clip_frames)
