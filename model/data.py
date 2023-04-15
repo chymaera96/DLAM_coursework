@@ -97,7 +97,7 @@ class NeuralfpDataset(Dataset):
             # print(X_j.shape)
 
 
-            return torch.unsqueeze(X_i, 0), torch.unsqueeze(X_j, 0)
+            return torch.unsqueeze(X_i.T, 0), torch.unsqueeze(X_j.T, 0)
         
         #   For validation / test, output list of spectrograms of consecutive (overlapping) frames
         else:
@@ -110,7 +110,7 @@ class NeuralfpDataset(Dataset):
                 X = torchaudio.transforms.AmplitudeToDB()(X)
                 if X.size(-1) < self.n_frames:
                     X = F.pad(X, (self.n_frames - X.size(-1), 0))
-                X = torch.unsqueeze(X, 0)
+                X = torch.unsqueeze(X.T, 0)
                 list_of_specs.append(X)
             return torch.unsqueeze(torch.cat(list_of_specs),1), self.filenames[str(idx)]
     
