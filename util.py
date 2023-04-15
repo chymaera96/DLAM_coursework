@@ -19,6 +19,7 @@ def load_index(data_dir, ext=['wav','mp3']):
     with open(json_path, 'w') as fp:
         json.dump(dataset, fp)
 
+    print(dataset)
     return dataset
 
 def get_frames(y, frame_length, hop_length):
