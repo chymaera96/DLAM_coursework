@@ -1,28 +1,32 @@
-from torch_audiomentations import Compose,FrequencyMask,TimeMask,AddBackgroundNoise, ApplyImpulseResponse
+from torch_audiomentations import Compose,AddBackgroundNoise, ApplyImpulseResponse
+from torchaudio.transforms import TimeMasking, FrequencyMasking
 import numpy as np
 import os
 import random
 import librosa
+import torch.nn as nn
 
 class TransformNeuralfp:
     
     def __init__(self, ir_dir, noise_dir, sample_rate):
         self.sample_rate = sample_rate
         self.ir_dir = ir_dir
-        self.train_transform_i = Compose([
-            FrequencyMask(min_frequency_band=0.1, max_frequency_band=0.5,p=0.8),
-            TimeMask(min_band_part=0.1, max_band_part=0.5),
+        # self.train_transform_i = Compose([
+        #     FrequencyMask(min_frequency_band=0.1, max_frequency_band=0.5,p=0.8),
+        #     TimeMask(min_band_part=0.1, max_band_part=0.5),
 
-            ])
+        #     ])
         
         self.train_transform_j = Compose([
             ApplyImpulseResponse(ir_path=ir_dir, p=0.8, sample_rate=self.sample_rate),
-            FrequencyMask(min_frequency_band=0.1, max_frequency_band=0.5,p=0.8),
-            TimeMask(min_band_part=0.1, max_band_part=0.5),
-            # ClippingDistortion(min_percentile_threshold=0, max_percentile_threshold=10),
             AddBackgroundNoise(sounds_path=noise_dir, min_snr_in_db=0, max_snr_in_db=7,p=0.8),
 
             ])
+        
+        self.spec_aug = nn.Sequential(
+            TimeMasking(time_mask_param=80),
+            FrequencyMasking(freq_mask_param=64)
+        )
     def irconv(self, x, p):
         ir_dir = self.ir_dir
         if random.random() < p:
@@ -46,4 +50,6 @@ class TransformNeuralfp:
             
     def __call__(self, x_i, x_j):
         # x_j = self.irconv(x_j, p=0.8)
-        return self.train_transform_i(x_i, sample_rate=self.sample_rate), self.train_transform_j(x_j, sample_rate=self.sample_rate)
+        x_i = self.spec_aug(x_i)
+        x_j = self.spec_aug(x_j)
+        return x_i, self.train_transform_j(x_j, sample_rate=self.sample_rate)
