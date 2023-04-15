@@ -52,7 +52,7 @@ class NeuralfpDataset(Dataset):
 
         # audio_mono = audio.mean(dim=0)
         if self.norm is not None:
-            audio_mono = qtile_normalize(audio, q=self.norm)
+            audio_mono = qtile_normalize(audio_mono, q=self.norm)
         # print(f"audio length ----> {len(audioData)}")
         resampler = torchaudio.transforms.Resample(sr, SAMPLE_RATE)
         audio_resampled = resampler(audio_mono)    # Downsampling
@@ -68,7 +68,7 @@ class NeuralfpDataset(Dataset):
         #   For training pipeline, output augmented spectrograms of a random frame of the audio
         if self.train:
             offset_mod = int(SAMPLE_RATE*(self.offset) + clip_frames)
-            if len(audio_mono) < offset_mod:
+            if len(audio_resampled) < offset_mod:
                 print(len(audio_resampled), offset_mod)
             r = np.random.randint(0,len(audio_resampled)-offset_mod)
             ri = np.random.randint(0,offset_mod - clip_frames)
