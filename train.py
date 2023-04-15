@@ -14,7 +14,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 # Directories
 root = os.path.dirname(__file__)
-model_folder = os.path.join(root,"model")
+model_folder = os.path.join(root,"checkpoint")
 data_dir = os.path.join(root,"data/fma_8000")
 # json_dir = os.path.join(root,"data/fma_10k.json")
 ir_dir = os.path.join(root,'data/augmentation_datasets/ir_filters')
@@ -32,6 +32,8 @@ parser.add_argument('--seed', default=None, type=int,
                     help='seed for initializing training. ')
 parser.add_argument('--sr', default=22050, type=int,
                     help='Sampling rate ')
+parser.add_argument('--ckp', default='sfnet', type=str, metavar='NAME',
+                    help='checkpoint_name')
 
 
 def ntxent_loss(z_i, z_j, tau=0.05):
@@ -95,6 +97,7 @@ def main():
     learning_rate = 1e-4
     num_epochs = args.epochs
     sample_rate = args.sr
+    model_name = args.ckp
     random_seed = 42
 
     # sub_dir = create_train_set(data_dir)
@@ -167,7 +170,7 @@ def main():
                 'optimizer': optimizer.state_dict(),
                 'scheduler': scheduler.state_dict()
             }
-            save_ckp(checkpoint,epoch)
+            save_ckp(checkpoint,epoch, model_name, model_folder)
         scheduler.step()
     
   

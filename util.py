@@ -32,7 +32,7 @@ def get_frames(y, frame_length, hop_length):
     return frames
 
 def qtile_normalize(y, q, eps=1e-8):
-    return y / (eps + np.quantile(y,q=q))
+    return y / (eps + torch.quantile(y,q=q))
 
 
 def load_ckp(checkpoint_fpath, model, optimizer, scheduler):
