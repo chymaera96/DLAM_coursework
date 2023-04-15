@@ -29,7 +29,7 @@ class NeuralfpDataset(Dataset):
         if idx in self.ignore_idx:
             return self[idx + 1]
         
-        datapath = os.path.join(self.path, self.filenames[str(idx)])
+        datapath = self.filenames[str(idx)]
         try:
             audio, sr = torchaudio.load(datapath)
         except Exception:
