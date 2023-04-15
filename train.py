@@ -161,7 +161,7 @@ def main():
         print("#######Epoch {}#######".format(epoch))
         loss_epoch = train(train_loader, model, optimizer)
         loss_log.append(loss_epoch)
-        if loss_epoch < best_loss and epoch%10==0:
+        if loss_epoch < best_loss:
             best_loss = loss_epoch
             
             checkpoint = {
