@@ -47,12 +47,13 @@ def create_train_set(data_dir, size=8000):
     dest = os.path.join(data_dir, f'fma_{size}')
     if not os.path.exists(dest):
         os.mkdir(dest)
-    if len(os.listdir(dest)) >= 8000:
-        return dest
+
     for ix,fname in enumerate(os.listdir(data_dir)):
         fpath = os.path.join(data_dir, fname)
         if ix <= 8000 and fpath.endswith('mp3'):
             shutil.move(fpath,dest)
+        if len(os.listdir(dest)) >= 8000:
+            return dest
     # source_dir = os.path.join(data_dir, f'fma_{size}')
     # target_dir = data_dir
         
