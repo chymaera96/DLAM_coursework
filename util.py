@@ -84,3 +84,13 @@ def create_downstream_set(data_dir, size=5000):
             shutil.move(fpath,dest)
 
     return dest
+
+
+def main():
+    root = os.path.dirname(__file__)
+    data_dir = os.path.join(root, 'data')
+    create_downstream_set(data_dir)
+
+
+if __name__ == '__main__':
+    main()
