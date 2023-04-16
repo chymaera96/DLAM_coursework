@@ -5,8 +5,14 @@ from torch.utils.data import Dataset
 import torch.nn.functional as F
 import torchaudio
 import numpy as np
+import librosa
+from librosa.feature import melspectrogram
 import warnings
-from torchaudio.transforms import MelSpectrogram
+from torchaudio.transforms import MelSpectrogram, TimeMasking, FrequencyMasking
+import torch.nn as nn
+import warnings
+
+
 from util import load_index, get_frames, qtile_normalize
 
 clip_len = 2.0
@@ -21,6 +27,10 @@ class NeuralfpDataset(Dataset):
         self.offset = offset 
         self.n_frames = n_frames
         self.filenames = load_index(path)
+        self.spec_aug = nn.Sequential(
+            TimeMasking(time_mask_param=80),
+            FrequencyMasking(freq_mask_param=64)
+)
 
         self.ignore_idx = []
   
@@ -72,21 +82,27 @@ class NeuralfpDataset(Dataset):
                 x_i, x_j = self.transform(org.numpy(), rep.numpy())
             x_i = torch.from_numpy(x_i)
             x_j = torch.from_numpy(x_j)
-    
+            
+            # print(f"{x_i} x_i.shape")
+            # print(x_j.shape)
             X_i = spec(x_i)
             X_i = torchaudio.transforms.AmplitudeToDB()(X_i)
             X_i = F.pad(X_i, (self.n_frames - X_i.size(-1), 0))
+            X_i = self.spec_aug(X_i)
     
             X_j = spec(x_j)
             X_j = torchaudio.transforms.AmplitudeToDB()(X_j)
             X_j = F.pad(X_j, (self.n_frames - X_j.size(-1), 0))
+            X_j = self.spec_aug(X_j)
+            # print(X_j.shape)
 
-            return torch.unsqueeze(X_i, 0), torch.unsqueeze(X_j, 0)
+
+            return torch.unsqueeze(X_i.T, 0), torch.unsqueeze(X_j.T, 0)
         
         #   For validation / test, output list of spectrograms of consecutive (overlapping) frames
         else:
-            frame_length = int(SAMPLE_RATE*1.0)
-            hop_length = int(SAMPLE_RATE*1.0/2)
+            frame_length = int(SAMPLE_RATE*clip_len)
+            hop_length = int(SAMPLE_RATE*clip_len/2)
             framed_audio = get_frames(audio_resampled, frame_length, hop_length)
             list_of_specs = []
             for frame in framed_audio:
@@ -94,7 +110,7 @@ class NeuralfpDataset(Dataset):
                 X = torchaudio.transforms.AmplitudeToDB()(X)
                 if X.size(-1) < self.n_frames:
                     X = F.pad(X, (self.n_frames - X.size(-1), 0))
-                X = torch.unsqueeze(X, 0)
+                X = torch.unsqueeze(X.T, 0)
                 list_of_specs.append(X)
             return torch.unsqueeze(torch.cat(list_of_specs),1), self.filenames[str(idx)]
     

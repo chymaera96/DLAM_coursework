@@ -14,7 +14,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 # Directories
 root = os.path.dirname(__file__)
-model_folder = os.path.join(root,"model")
+model_folder = os.path.join(root,"checkpoint")
 data_dir = os.path.join(root,"data/fma_8000")
 # json_dir = os.path.join(root,"data/fma_10k.json")
 ir_dir = os.path.join(root,'data/augmentation_datasets/ir_filters')
@@ -32,6 +32,8 @@ parser.add_argument('--seed', default=None, type=int,
                     help='seed for initializing training. ')
 parser.add_argument('--sr', default=22050, type=int,
                     help='Sampling rate ')
+parser.add_argument('--ckp', default='sfnet', type=str, metavar='NAME',
+                    help='checkpoint_name')
 
 
 def ntxent_loss(z_i, z_j, tau=0.05):
@@ -95,6 +97,7 @@ def main():
     learning_rate = 1e-4
     num_epochs = args.epochs
     sample_rate = args.sr
+    model_name = args.ckp
     random_seed = 42
 
     # sub_dir = create_train_set(data_dir)
@@ -103,6 +106,7 @@ def main():
     print(noise_dir)
     assert data_dir == os.path.join(root,"data/fma_8000")
 
+    print("Loading dataset...")
     train_dataset = NeuralfpDataset(path=data_dir, transform=TransformNeuralfp(ir_dir=ir_dir, noise_dir=noise_dir,sample_rate=sample_rate), train=True)
     # validation_dataset = NeuralfpDataset(path=data_dir, transform=TransformNeuralfp(ir_dir=ir_dir, noise_dir=noise_dir,sample_rate=sample_rate), train=True)
 
@@ -128,7 +132,7 @@ def main():
     #     sampler=valid_sampler)
     
     
-    
+    print("Creating new model...")
     model = SimCLR(encoder=SlowFastNetwork(ResidualUnit, layers=[1,1,1,1])).to(device)
     # model = nn.DataParallel(model).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -148,7 +152,7 @@ def main():
         start_epoch = 0
         loss_log = []
 
-    
+    print("Calculating initial loss ...")
     best_loss = train(train_loader, model, optimizer)
 
     # training
@@ -157,7 +161,7 @@ def main():
         print("#######Epoch {}#######".format(epoch))
         loss_epoch = train(train_loader, model, optimizer)
         loss_log.append(loss_epoch)
-        if loss_epoch < best_loss and epoch%10==0:
+        if loss_epoch < best_loss:
             best_loss = loss_epoch
             
             checkpoint = {
@@ -167,7 +171,7 @@ def main():
                 'optimizer': optimizer.state_dict(),
                 'scheduler': scheduler.state_dict()
             }
-            save_ckp(checkpoint,epoch)
+            save_ckp(checkpoint,epoch, model_name, model_folder)
         scheduler.step()
     
   

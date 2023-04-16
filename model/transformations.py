@@ -1,4 +1,5 @@
-from audiomentations import Compose,FrequencyMask,TimeMask,AddBackgroundNoise
+# from torch_audiomentations import Compose,AddBackgroundNoise, ApplyImpulseResponse
+from audiomentations import Compose,AddBackgroundNoise, ApplyImpulseResponse
 import numpy as np
 import os
 import random
@@ -9,20 +10,18 @@ class TransformNeuralfp:
     def __init__(self, ir_dir, noise_dir, sample_rate):
         self.sample_rate = sample_rate
         self.ir_dir = ir_dir
-        self.train_transform_i = Compose([
-            FrequencyMask(min_frequency_band=0.1, max_frequency_band=0.5,p=0.8),
-            TimeMask(min_band_part=0.1, max_band_part=0.5),
+        # self.train_transform_i = Compose([
+        #     FrequencyMask(min_frequency_band=0.1, max_frequency_band=0.5,p=0.8),
+        #     TimeMask(min_band_part=0.1, max_band_part=0.5),
+
+        #     ])
+        
+        self.train_transform_j = Compose([
+            ApplyImpulseResponse(ir_path=self.ir_dir, p=0.5, leave_length_unchanged=True),
+            AddBackgroundNoise(sounds_path=noise_dir, min_snr_in_db=0, max_snr_in_db=20,p=0.8),
 
             ])
         
-        self.train_transform_j = Compose([
-            # AddImpulseResponse(ir_path=ir_dir, p=0.8),
-            FrequencyMask(min_frequency_band=0.1, max_frequency_band=0.5,p=0.8),
-            TimeMask(min_band_part=0.1, max_band_part=0.5),
-            # ClippingDistortion(min_percentile_threshold=0, max_percentile_threshold=10),
-            AddBackgroundNoise(sounds_path=noise_dir, min_snr_in_db=0, max_snr_in_db=7,p=0.8),
-
-            ])
     def irconv(self, x, p):
         ir_dir = self.ir_dir
         if random.random() < p:
@@ -45,5 +44,6 @@ class TransformNeuralfp:
         return x_aug.astype(np.float32)
             
     def __call__(self, x_i, x_j):
-        x_j = self.irconv(x_j, p=0.8)
-        return self.train_transform_i(x_i, sample_rate=self.sample_rate), self.train_transform_j(x_j, sample_rate=self.sample_rate)
+        # x_j = self.irconv(x_j, p=0.8)
+        x_j = self.train_transform_j(x_j, sample_rate=self.sample_rate)
+        return x_i, x_j
