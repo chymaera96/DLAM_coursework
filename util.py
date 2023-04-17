@@ -79,12 +79,12 @@ def create_downstream_set(data_dir, size=5000):
     #     os.mkdir(dest)   
     # if len(os.listdir(dest)) >= size:
     #     return dest
-    for ix,fname in enumerate(src):
+    for ix,fname in enumerate(os.listdir(src)):
         fpath = os.path.join(src, fname)
         if not fpath.endswith('mp3'):
             continue
         # if ix < size:
-        if len(os.listdir(dest)) > 500:
+        if len(os.listdir(src)) > 500:
             shutil.move(fpath,dest)
 
     return dest
