@@ -73,18 +73,18 @@ def create_train_set(data_dir, size=8000):
     return dest
 
 def create_downstream_set(data_dir, size=5000):
-    dest = os.path.join(data_dir, f'fma_downstream')
-    if not os.path.exists(dest):
-        os.mkdir(dest)   
-    if len(os.listdir(dest)) >= size:
-        return dest
-    for ix,fname in enumerate(os.listdir(data_dir)):
-        if len(os.listdir(dest)) >= size:
-            return dest
-        fpath = os.path.join(data_dir, fname)
+    src = os.path.join(data_dir, f'fma_downstream')
+    dest = data_dir
+    # if not os.path.exists(dest):
+    #     os.mkdir(dest)   
+    # if len(os.listdir(dest)) >= size:
+    #     return dest
+    for ix,fname in enumerate(src):
+        fpath = os.path.join(src, fname)
         if not fpath.endswith('mp3'):
             continue
-        if ix < size:
+        # if ix < size:
+        if len(os.listdir(dest)) > 500:
             shutil.move(fpath,dest)
 
     return dest
