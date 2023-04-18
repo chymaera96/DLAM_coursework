@@ -32,6 +32,7 @@ parser.add_argument('--query_lens', default='1 3 5 9 11 19', type=str)
 parser.add_argument('--n_dummy_db', default=500, type=int)
 parser.add_argument('--n_query_db', default=20, type=int)
 parser.add_argument('--compute_fp', default=True, type=bool)
+parser.add_argument('--small_test', default=False, type=bool)
 
 
 device = torch.device('cuda' if torch.cuda.is_available else 'cpu')
