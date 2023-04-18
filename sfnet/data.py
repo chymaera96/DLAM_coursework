@@ -130,7 +130,7 @@ class NeuralfpDataset(Dataset):
                 if X_j.size(-1) < self.n_frames:
                     X_j = F.pad(X_j, (self.n_frames - X_j.size(-1), 0))
                 X_j = torch.unsqueeze(X_j.T, 0)
-                list_of_specs_i.append(X_j)
+                list_of_specs_j.append(X_j)
 
                 assert len(list_of_specs_i) > 0 
 
