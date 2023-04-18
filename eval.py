@@ -295,7 +295,7 @@ def eval_faiss(emb_dir,
     top10_exact_rate = 100. * np.mean(top10_exact, axis=0)
     # top1_song = 100 * np.mean(top1_song[:ti + 1, :], axis=0)
 
-    hit_rates = np.concatenate(top1_exact_rate, top1_near_rate, top3_exact_rate, top10_exact_rate)
+    hit_rates = np.concatenate([top1_exact_rate, top1_near_rate, top3_exact_rate, top10_exact_rate])
 
     del fake_recon_index, query, db
     np.save(f'{emb_dir}/raw_score.npy',
