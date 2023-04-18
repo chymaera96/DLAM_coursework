@@ -49,8 +49,8 @@ def create_fp_db(dataloader, model, output_root_dir, save=True):
             with torch.no_grad():
                 _, _, z_i, z_j= model(x_i,x_j)
 
-            z_i = z_i.detach().numpy()
-            z_j = z_j.detach().numpy()
+            z_i = z_i.detach().cpu().numpy()
+            z_j = z_j.detach().cpu().numpy()
 
             fp_db.append(z_i)
             fp_q.append(z_j)
@@ -92,7 +92,7 @@ def create_dummy_db(dataloader, model, output_root_dir, save=True):
             with torch.no_grad():
                 _, _, z_i, _= model(x_i,x_i)
 
-            z_i = z_i.detach().numpy()
+            z_i = z_i.detach().cpu().numpy()
 
             fp.append(z_i)
 
