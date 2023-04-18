@@ -51,6 +51,7 @@ def get_index(index_type,
     index = faiss.IndexFlatL2(d) #
 
     mode = index_type.lower()
+    assert mode == 'l2'
     print(f'Creating index: \033[93m{mode}\033[0m')
     if mode == 'l2':
         # Using L2 index
