@@ -111,7 +111,7 @@ def create_dummy_db(dataloader, model, output_root_dir, save=True):
     arr[:] = fp[:]
     arr.flush(); del(arr)   #Close memmap
 
-    np.save(f'{output_root_dir}/dummy_shape.npy', arr_shape)
+    np.save(f'{output_root_dir}/dummy_db_shape.npy', arr_shape)
 
 
 def main():
