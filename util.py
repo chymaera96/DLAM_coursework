@@ -16,9 +16,7 @@ def load_index(data_dir, ext=['wav','mp3'], max_len=4000):
             if fpath.split('.')[-1] in ext and idx < max_len: 
                 dataset[str(idx)] = fpath
                 idx += 1
-            
-            
-        
+
         with open(json_path, 'w') as fp:
             json.dump(dataset, fp)
     

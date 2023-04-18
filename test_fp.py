@@ -174,8 +174,8 @@ def main():
         os.mkdir(args.fp_dir)
 
     if args.compute_fp == True:
-        create_fp_db(dummy_db_loader, model, args.fp_dir)
-        create_dummy_db(query_db_loader, model, args.fp_dir)
+        create_fp_db(query_db_loader, model, args.fp_dir)
+        create_dummy_db(dummy_db_loader, model, args.fp_dir)
 
     if args.small_test:
         index_type = 'l2'
