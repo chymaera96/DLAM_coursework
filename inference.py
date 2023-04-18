@@ -128,7 +128,7 @@ def main():
 
     args = parser.parse_args()
     dataset = ClassificationDataset(index_path=args.index_path, emb_path = args.emb_path)
-    batch_size = 32
+    batch_size = 128
     train_split = .7
     validation_split = .2
     shuffle_dataset = True
