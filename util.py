@@ -15,6 +15,7 @@ def load_index(data_dir, ext=['wav','mp3'], max_len=4000):
             print(f"fpath {idx} is {fpath}")
 
             if fpath.split('.')[-1] in ext and idx < max_len: 
+                print(fpath)
                 dataset[str(idx)] = fpath
             
         
