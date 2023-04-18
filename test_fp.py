@@ -31,7 +31,7 @@ parser.add_argument('--ckp', default='', type=str)
 parser.add_argument('--query_lens', default='1 3 5 9 11 19', type=str)
 parser.add_argument('--n_dummy_db', default=500, type=int)
 parser.add_argument('--n_query_db', default=20, type=int)
-
+parser.add_argument('--n_compute_fp', default=True, type=bool)
 
 
 device = torch.device('cuda' if torch.cuda.is_available else 'cpu')
@@ -172,8 +172,9 @@ def main():
     if not os.path.exists(args.fp_dir):
         os.mkdir(args.fp_dir)
 
-    create_fp_db(dummy_db_loader, model, args.fp_dir)
-    create_dummy_db(query_db_loader, model, args.fp_dir)
+    if args.compute_fp:
+        create_fp_db(dummy_db_loader, model, args.fp_dir)
+        create_dummy_db(query_db_loader, model, args.fp_dir)
 
     eval_faiss(emb_dir=args.fp_dir, test_ids='all', test_seq_len=args.query_lens, index_type='l2')
 
