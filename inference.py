@@ -171,7 +171,7 @@ def main():
         input_dim = 1984
     elif args.emb_type == 'clmr':
         input_dim = 5632
-    model = LinearEvaluation(input_dim, 64, 10).to(device)
+    model = LinearEvaluation(input_dim, 128, 10).to(device)
     criterion   = nn.CrossEntropyLoss()  
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
