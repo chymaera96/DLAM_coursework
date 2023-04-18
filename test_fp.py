@@ -23,7 +23,6 @@ parser.add_argument('--test_dir', default='', type=str)
 parser.add_argument('--fp_dir', default='fingerprints', type=str)
 parser.add_argument('--ckp', default='', type=str)
 parser.add_argument('--query_lens', default='1 3 5 9, 11, 19', type=str)
-\
 
 
 
