@@ -4,6 +4,7 @@ import numpy as np
 import os
 import random
 import librosa
+import warnings
 
 class TransformNeuralfp:
     
@@ -45,5 +46,7 @@ class TransformNeuralfp:
             
     def __call__(self, x_i, x_j):
         # x_j = self.irconv(x_j, p=0.8)
-        x_j = self.train_transform_j(x_j, sample_rate=self.sample_rate)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            x_j = self.train_transform_j(x_j, sample_rate=self.sample_rate)
         return x_i, x_j
