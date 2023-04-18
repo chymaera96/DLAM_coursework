@@ -18,6 +18,12 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 
 
+# Directories
+root = os.path.dirname(__file__)
+
+ir_dir = os.path.join(root,'data/augmentation_datasets/ir_filters')
+noise_dir = os.path.join(root,'data/augmentation_datasets/noise')
+
 parser = argparse.ArgumentParser(description='Neuralfp Testing')
 parser.add_argument('--test_dir', default='', type=str)
 parser.add_argument('--fp_dir', default='fingerprints', type=str)
@@ -130,7 +136,7 @@ def main():
 
 
     print("Creating dataloaders ...")
-    dataset = NeuralfpDataset(path=args.test_dir, train=False)
+    dataset = NeuralfpDataset(path=args.test_dir, transform=TransformNeuralfp(ir_dir=ir_dir, noise_dir=noise_dir,sample_rate=22050), train=False)
 
 
     dataset_size = len(dataset)
@@ -141,9 +147,12 @@ def main():
         np.random.seed(random_seed)
         np.random.shuffle(indices)
     dummy_indices, query_db_indices = indices[:split1], indices[split1: split1 + split2]
+    print(f"Length of indices {dummy_indices} {query_db_indices}")
 
     dummy_db_sampler = SubsetRandomSampler(dummy_indices)
     query_db_sampler = SubsetRandomSampler(query_db_indices)
+
+    
 
     dummy_db_loader = torch.utils.data.DataLoader(dataset, batch_size=1, 
                                             shuffle=False,
