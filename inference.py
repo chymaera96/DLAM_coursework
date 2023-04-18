@@ -101,7 +101,7 @@ class ClassificationDataset(Dataset):
         return data, self.targets[idx]
     
     def __len__(self):
-        return len(self.filenames)
+        return len(self.targets)
 
 
 
