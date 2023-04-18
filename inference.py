@@ -184,7 +184,7 @@ def main():
         train_loss = train(loader=train_loader, model=model, optimizer=optimizer, criterion=criterion)
         valid_loss = validate(loader=valid_loader, model=model, criterion=criterion)
 
-        if valid_loss < best_loss:
+        if valid_loss < best_loss or epoch > 0:
             best_loss = valid_loss   
             t_loss_log.append(train_loss)
             v_loss_log.append(valid_loss)
