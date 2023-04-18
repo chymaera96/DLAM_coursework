@@ -172,7 +172,7 @@ def main():
     if not os.path.exists(args.fp_dir):
         os.mkdir(args.fp_dir)
 
-    if args.compute_fp:
+    if not args.compute_fp:
         create_fp_db(dummy_db_loader, model, args.fp_dir)
         create_dummy_db(query_db_loader, model, args.fp_dir)
 
