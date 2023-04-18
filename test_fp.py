@@ -161,7 +161,7 @@ def main():
     if not os.path.exists(args.fp_dir):
         os.mkdir(args.fp_dir)
 
-    create_fp_db(query_db_loader, model, args.fp_dir)
+    create_fp_db(dummy_db_loader, model, args.fp_dir)
     create_dummy_db(query_db_loader, model, args.fp_dir)
 
     eval_faiss(emb_dir=args.fp_dir, test_ids='all', test_seq_len=args.text_seq_len)
