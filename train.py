@@ -5,10 +5,10 @@ import torch
 import torch.nn.functional as F
 
 from util import load_ckp, save_ckp, create_train_set
-from model.transformations import TransformNeuralfp
-from model.data import NeuralfpDataset
-from model.modules.simclr import SimCLR
-from model.modules.residual import SlowFastNetwork, ResidualUnit
+from sfnet.transformations import TransformNeuralfp
+from sfnet.data import NeuralfpDataset
+from sfnet.modules.simclr import SimCLR
+from sfnet.modules.residual import SlowFastNetwork, ResidualUnit
 from torch.utils.data.sampler import SubsetRandomSampler
 
 

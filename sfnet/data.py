@@ -104,15 +104,37 @@ class NeuralfpDataset(Dataset):
             frame_length = int(SAMPLE_RATE*clip_len)
             hop_length = int(SAMPLE_RATE*clip_len/2)
             framed_audio = get_frames(audio_resampled, frame_length, hop_length)
-            list_of_specs = []
+            assert len(framed_audio) > 0 
+            list_of_specs_i = []
+            list_of_specs_j = []
+
             for frame in framed_audio:
-                X = spec(frame)
-                X = torchaudio.transforms.AmplitudeToDB()(X)
-                if X.size(-1) < self.n_frames:
-                    X = F.pad(X, (self.n_frames - X.size(-1), 0))
-                X = torch.unsqueeze(X.T, 0)
-                list_of_specs.append(X)
-            return torch.unsqueeze(torch.cat(list_of_specs),1), self.filenames[str(idx)]
+                if self.transform:
+                    f_i, f_j = self.transform(frame.numpy(), frame.numpy())
+                    f_i = torch.from_numpy(f_i)
+                    f_j = torch.from_numpy(f_j)
+
+                else:
+                    f_i = frame
+                    f_j = frame.clone()
+
+                X_i = spec(f_i)
+                X_i = torchaudio.transforms.AmplitudeToDB()(X_i)
+                if X_i.size(-1) < self.n_frames:
+                    X_i = F.pad(X_i, (self.n_frames - X_i.size(-1), 0))
+                X_i = torch.unsqueeze(X_i.T, 0)
+                list_of_specs_i.append(X_i)
+
+                X_j = spec(f_j)
+                X_j = torchaudio.transforms.AmplitudeToDB()(X_j)
+                if X_j.size(-1) < self.n_frames:
+                    X_j = F.pad(X_j, (self.n_frames - X_j.size(-1), 0))
+                X_j = torch.unsqueeze(X_j.T, 0)
+                list_of_specs_j.append(X_j)
+
+                assert len(list_of_specs_i) > 0 
+
+            return torch.unsqueeze(torch.cat(list_of_specs_i),1), torch.unsqueeze(torch.cat(list_of_specs_j),1)
     
     def __len__(self):
         return len(self.filenames)
