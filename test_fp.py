@@ -176,7 +176,11 @@ def main():
         create_fp_db(dummy_db_loader, model, args.fp_dir)
         create_dummy_db(query_db_loader, model, args.fp_dir)
 
-    eval_faiss(emb_dir=args.fp_dir, test_ids='all', test_seq_len=args.query_lens, index_type='l2')
+    if args.small_test:
+        index_type = 'l2'
+    else:
+        index_type = 'ivfpq'
+    eval_faiss(emb_dir=args.fp_dir, test_ids='all', test_seq_len=args.query_lens, index_type=index_type)
 
 
 if __name__ == '__main__':
