@@ -141,13 +141,13 @@ def main():
 
     dataset_size = len(dataset)
     indices = list(range(dataset_size))
-    split1 = args.n_dummy_db * 29
-    split2 = args.n_query_db * 29
+    split1 = args.n_dummy_db
+    split2 = args.n_query_db
     if shuffle_dataset :
         np.random.seed(random_seed)
         np.random.shuffle(indices)
     dummy_indices, query_db_indices = indices[:split1], indices[split1: split1 + split2]
-    print(f"Length of indices {dummy_indices} {query_db_indices}")
+    print(f"Length of indices {len(dummy_indices)} {len(query_db_indices)}")
 
     dummy_db_sampler = SubsetRandomSampler(dummy_indices)
     query_db_sampler = SubsetRandomSampler(query_db_indices)
