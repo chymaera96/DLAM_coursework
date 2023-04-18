@@ -111,6 +111,8 @@ class NeuralfpDataset(Dataset):
             for frame in framed_audio:
                 if self.transform:
                     f_i, f_j = self.transform(frame.numpy(), frame.numpy())
+                    f_i = torch.from_numpy(f_i)
+                    f_j = torch.from_numpy(f_j)
 
                 else:
                     f_i = frame
