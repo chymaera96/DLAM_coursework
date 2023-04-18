@@ -62,13 +62,13 @@ def get_index(index_type,
     elif mode == 'ivfpq':
         # Using IVF-PQ index
         code_sz = 64 # power of 2
-        n_centroids = 16
+        n_centroids = 32
         nbits = 8  # nbits must be 8, 12 or 16, The dimension d should be a multiple of M.
         index = faiss.IndexIVFPQ(index, d, n_centroids, code_sz, nbits)
     elif mode == 'ivfpq-rr':
         # Using IVF-PQ index + Re-rank
         code_sz = 64
-        n_centroids = 256# 10:1.92ms, 30:1.29ms, 100: 0.625ms
+        n_centroids = 16 # 10:1.92ms, 30:1.29ms, 100: 0.625ms
         nbits = 8  # nbits must be 8, 12 or 16, The dimension d should be a multiple of M.
         M_refine = 4
         nbits_refine = 4
