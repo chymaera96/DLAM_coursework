@@ -136,7 +136,7 @@ def main():
     dataset_size = len(dataset)
     indices = list(range(dataset_size))
     split1 = args.n_dummy_db * 29
-    split2 = args.query_db * 29
+    split2 = args.n_query_db * 29
     if shuffle_dataset :
         np.random.seed(random_seed)
         np.random.shuffle(indices)
