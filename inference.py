@@ -68,7 +68,7 @@ def validate(model, loader, criterion):
         loss_epoch += loss.item()
 
         if batch_idx % 4 == 0:
-            print(f"                                 ------> valid loss = {loss.item()}")
+            print(f""Step [{batch_idx}/{len(loader)}]------> valid loss = {loss.item()}")
 
   return loss_epoch
 
