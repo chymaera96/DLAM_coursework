@@ -57,18 +57,10 @@ def create_train_set(data_dir, size=8000):
 
     for ix,fname in enumerate(os.listdir(data_dir)):
         fpath = os.path.join(data_dir, fname)
-        if ix <= 8000 and fpath.endswith('mp3'):
+        if ix <= size and fpath.endswith('mp3'):
             shutil.move(fpath,dest)
-        if len(os.listdir(dest)) >= 8000:
+        if len(os.listdir(dest)) >= size:
             return dest
-    # source_dir = os.path.join(data_dir, f'fma_{size}')
-    # target_dir = data_dir
-        
-    # file_names = os.listdir(source_dir)
-        
-    # for file_name in file_names:
-    #     shutil.move(os.path.join(source_dir, file_name), target_dir)
-
     
     return dest
 
@@ -88,13 +80,3 @@ def create_downstream_set(data_dir, size=5000):
             shutil.move(fpath,dest)
 
     return dest
-
-
-def main():
-    root = os.path.dirname(__file__)
-    data_dir = os.path.join(root, 'data')
-    create_downstream_set(data_dir)
-
-
-if __name__ == '__main__':
-    main()
