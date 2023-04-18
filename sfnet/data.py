@@ -104,6 +104,7 @@ class NeuralfpDataset(Dataset):
             frame_length = int(SAMPLE_RATE*clip_len)
             hop_length = int(SAMPLE_RATE*clip_len/2)
             framed_audio = get_frames(audio_resampled, frame_length, hop_length)
+            assert len(framed_audio) > 0 
             list_of_specs_i = []
             list_of_specs_j = []
 
