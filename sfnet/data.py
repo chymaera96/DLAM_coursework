@@ -129,6 +129,8 @@ class NeuralfpDataset(Dataset):
                 X_j = torch.unsqueeze(X_j.T, 0)
                 list_of_specs_i.append(X_j)
 
+                assert len(list_of_specs_i) > 0 
+
             return torch.unsqueeze(torch.cat(list_of_specs_i),1), torch.unsqueeze(torch.cat(list_of_specs_j),1)
     
     def __len__(self):
