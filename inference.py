@@ -184,20 +184,20 @@ def main():
         train_loss = train(loader=train_loader, model=model, optimizer=optimizer, criterion=criterion)
         valid_loss = validate(loader=valid_loader, model=model, criterion=criterion)
 
+        t_loss_log.append(train_loss)
+        v_loss_log.append(valid_loss)
         # if valid_loss < best_loss:
         if epoch == 50:
-            best_loss = valid_loss   
-            t_loss_log.append(train_loss)
-            v_loss_log.append(valid_loss)
+            best_loss = valid_loss
+            
             checkpoint = {
                 'epoch': epoch,
                 'train_loss': t_loss_log,
-                'valid_loss' : v_loss_log,
-                # 'state_dict': model.state_dict(),
-                # 'optimizer': optimizer.state_dict(),
+                'valid_loss': v_loss_log,
+                'state_dict': model.state_dict(),
+                'optimizer': optimizer.state_dict(),
             }
-            save_ckp(checkpoint,epoch, args.ckp, args.model_dir)
-
+            save_ckp(checkpoint, epoch, args.ckp, args.model_dir)
 
 
 
