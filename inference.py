@@ -133,7 +133,7 @@ def main():
     validation_split = .2
     shuffle_dataset = True
     random_seed= 42
-    n_epochs = 30
+    n_epochs = 50
 
     dataset_size = len(dataset)
     indices = list(range(dataset_size))
