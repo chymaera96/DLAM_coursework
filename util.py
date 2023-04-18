@@ -10,9 +10,10 @@ def load_index(data_dir, ext=['wav','mp3'], max_len=4000):
 
     print(f"=>Loading indices from {data_dir}")
     json_path = os.path.join(data_dir, data_dir.split('/')[-1] + ".json")
-
     if not os.path.exists(json_path):
         for idx,fpath in enumerate(glob.iglob(os.path.join(data_dir,'**/*.*'), recursive=True)):
+            print(f"fpath {ix} is {fpath}")
+
             if fpath.split('.')[-1] in ext and idx < max_len: 
                 dataset[str(idx)] = fpath
             
