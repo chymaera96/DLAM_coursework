@@ -182,7 +182,7 @@ def main():
     for epoch in range(1, n_epochs + 1):
         print(f"------ Epoch {epoch} ------")
         train_loss = train(loader=train_loader, model=model, optimizer=optimizer, criterion=criterion)
-        valid_loss = train(loader=valid_loader, model=model, optimizer=optimizer, criterion=criterion)
+        valid_loss = validate(loader=valid_loader, model=model, criterion=criterion)
 
         if valid_loss < best_loss:
             best_loss = valid_loss   
