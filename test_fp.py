@@ -22,7 +22,9 @@ parser = argparse.ArgumentParser(description='Neuralfp Testing')
 parser.add_argument('--test_dir', default='', type=str)
 parser.add_argument('--fp_dir', default='fingerprints', type=str)
 parser.add_argument('--ckp', default='', type=str)
-parser.add_argument('--query_lens', default='1 3 5 9, 11, 19', type=str)
+parser.add_argument('--query_lens', default='1 3 5 9 11 19', type=str)
+parser.add_argument('--n_dummy_db', default=500, type=int)
+parser.add_argument('--n_query_db', default=20, type=int)
 
 
 
@@ -133,8 +135,8 @@ def main():
 
     dataset_size = len(dataset)
     indices = list(range(dataset_size))
-    split1 = args.n_dummy_db
-    split2 = args.query_db
+    split1 = args.n_dummy_db * 29
+    split2 = args.query_db * 29
     if shuffle_dataset :
         np.random.seed(random_seed)
         np.random.shuffle(indices)
