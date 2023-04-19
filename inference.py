@@ -94,8 +94,8 @@ class ClassificationDataset(Dataset):
             return self[idx + 1]
         
         try:
-            data = self.embs[idx]
             print(self.embs.shape)
+            data = self.embs[idx]
         except Exception:
             print("Error loading:" + self.embs[idx])
             self.ignore_idx.append(idx)
