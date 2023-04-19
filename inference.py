@@ -94,7 +94,7 @@ class ClassificationDataset(Dataset):
             return self[idx + 1]
         
         try:
-            print(self.embs[0].shape)
+            # print(self.embs[0].shape)
             data = self.embs[idx]
         except Exception:
             print("Error loading:" + self.embs[idx])
@@ -138,7 +138,7 @@ def main():
     random_seed= 42
     n_epochs = 50
 
-    embs = torch.load(args.emb_path)
+    # embs = torch.load(args.emb_path)
     # print(embs[0].shape)
 
     dataset_size = len(dataset)
