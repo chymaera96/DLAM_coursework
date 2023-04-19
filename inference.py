@@ -29,7 +29,9 @@ def get_num_encodings(index_file):
     label_encoder = LabelEncoder()
     with open(index_file, 'r') as fp:
         filenames = json.load(fp)
-        labels = [f.split('/')[-1].split('.')[0] for f in filenames]
+    if type(filenames) is not list:     #SFNet index is a dictionary
+        filenames = [filenames[str(idx)] for idx in range(len(filenames))]
+    labels = [f.split('/')[-1].split('.')[0] for f in filenames]
     return label_encoder.fit_transform(labels)
 
 
