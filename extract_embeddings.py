@@ -1,4 +1,5 @@
 import torch
+import torch.nn.functional as F
 import argparse
 import json
 import os
@@ -30,7 +31,11 @@ def extract(dataloader, model):
 
         if idx % 10 == 0:
             print(f"Step [{idx}/{len(dataloader)}]\t shape: {z_i.shape}")
-        emb = torch.cat(emb)
+        emb = torch.cat(torch.flatten(emb))
+        if emb.shape[-1] < 1856:
+            emb = F.pad(emb, (1856 - emb.size(-1), 0))
+        elif emb.shape[-1] > 1856:
+            emb = emb[:1856]
         embs_per_file.append(emb)
         torch.save(torch.stack(embs_per_file), 'sfnet_embeddings.pt')
 
