@@ -31,7 +31,7 @@ def extract(dataloader, model):
 
         if idx % 10 == 0:
             print(f"Step [{idx}/{len(dataloader)}]\t shape: {z_i.shape}")
-        emb = torch.cat(torch.flatten(emb))
+        emb = torch.flatten(torch.cat(emb))
         if emb.shape[-1] < 1856:
             emb = F.pad(emb, (1856 - emb.size(-1), 0))
         elif emb.shape[-1] > 1856:
