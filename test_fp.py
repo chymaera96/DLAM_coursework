@@ -63,14 +63,16 @@ def create_fp_db(dataloader, model, output_root_dir, save=True):
     
     arr_shape = (len(fp_db), z_i.shape[-1])
     print(arr_shape)
-    # fp_db = np.concatenate(fp_db, axis=0)
-    # fp_q = np.concatenate(fp_db, axis=0)
+    fp_db = np.concatenate(fp_db)
+    # print(fp_db.shape)
+    fp_q = np.concatenate(fp_q)
 
     arr_q = np.memmap(f'{output_root_dir}/query.mm',
                     dtype='float32',
                     mode='w+',
                     shape=arr_shape)
-    print(fp_q.shape)
+    print(len(fp_q))
+    # print(fp_q[:])
     arr_q[:] = fp_q[:]
     arr_q.flush(); del(arr_q)   #Close memmap
 
@@ -85,7 +87,7 @@ def create_fp_db(dataloader, model, output_root_dir, save=True):
 
     np.save(f'{output_root_dir}/db_shape.npy', arr_shape)
 
-def create_dummy_db(dataloader, model, output_root_dir, save=True):
+def create_dummy_db(dataloader, model, output_root_dir, fname='dummy_db', save=True):
     fp = []
     print("=> Creating dummy fingerprints...")
     for idx, (db,q) in enumerate(dataloader):
@@ -105,17 +107,17 @@ def create_dummy_db(dataloader, model, output_root_dir, save=True):
         # fp = torch.cat(fp)
     
     arr_shape = (len(fp), z_i.shape[-1])
-    # fp_db = np.concatenate(fp_db, axis=0)
+    fp = np.concatenate(fp)
     # fp_q = np.concatenate(fp_db, axis=0)
 
-    arr = np.memmap(f'{output_root_dir}/dummy_db.mm',
+    arr = np.memmap(f'{output_root_dir}/{fname}.mm',
                     dtype='float32',
                     mode='w+',
                     shape=arr_shape)
     arr[:] = fp[:]
     arr.flush(); del(arr)   #Close memmap
 
-    np.save(f'{output_root_dir}/dummy_db_shape.npy', arr_shape)
+    np.save(f'{output_root_dir}/{fname}_shape.npy', arr_shape)
 
 
 def main():
@@ -190,17 +192,26 @@ def main():
     else:
 
         print("Creating dataloader ...")
-        dataset = NeuralfpDataset(path='/content/DLAM_coursework/data', train=False)
+        dataset_q = NeuralfpDataset(path='/content/DLAM_coursework/data/query', train=False)
+        dataset_db = NeuralfpDataset(path='/content/DLAM_coursework/data/db', train=False)
 
 
-        query_db_loader = torch.utils.data.DataLoader(dataset, batch_size=1, 
+        query_loader = torch.utils.data.DataLoader(dataset_q, batch_size=1, 
                                                 shuffle=False,
                                                 num_workers=0, 
                                                 pin_memory=True, 
                                                 drop_last=False)
 
-        create_fp_db(query_db_loader, model, args.fp_dir)
-        eval_faiss(emb_dir=args.fp_dir, test_ids='all', test_seq_len='1 3 5 9', index_type='l2')
+        db_loader = torch.utils.data.DataLoader(dataset_db, batch_size=1, 
+                                                shuffle=False,
+                                                num_workers=0, 
+                                                pin_memory=True, 
+                                                drop_last=False)
+
+        create_dummy_db(query_loader, model, args.fp_dir, fname='query')
+        create_dummy_db(db_loader, model, args.fp_dir, fname='db')
+
+        eval_faiss(emb_dir=args.fp_dir, test_ids='all', test_seq_len='1 3 5 8', index_type='l2')
 
 
 if __name__ == '__main__':
