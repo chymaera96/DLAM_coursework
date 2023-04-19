@@ -6,6 +6,6 @@ audiomentations
 scikit-learn
 soundfile
 simclr==1.0.2
-fais-gpu
+faiss-gpu
 pytorch-lightning==1.5.10
 gdown
