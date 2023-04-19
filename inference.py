@@ -166,10 +166,12 @@ def main():
 
     train_loader = DataLoader(
         dataset, batch_size=batch_size, num_workers=0,
+        shuffle=True,
         sampler=train_sampler
         )
     valid_loader = DataLoader(dataset, batch_size=batch_size,
         sampler=valid_sampler, 
+        shuffle=False,
         num_workers=0
         )
     
@@ -192,8 +194,8 @@ def main():
 
         t_loss_log.append(train_loss)
         v_loss_log.append(valid_loss)
-        # if valid_loss < best_loss:
-        if epoch == 50:
+        if valid_loss < best_loss:
+        # if epoch == 50:
             best_loss = valid_loss
             
             checkpoint = {
