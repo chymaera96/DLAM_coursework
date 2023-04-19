@@ -139,7 +139,7 @@ def main():
     n_epochs = 50
 
     embs = torch.load(args.emb_path)
-    print(embs[0].shape)
+    # print(embs[0].shape)
 
     dataset_size = len(dataset)
     indices = list(range(dataset_size))
@@ -165,12 +165,12 @@ def main():
 
 
     train_loader = DataLoader(
-        dataset, batch_size=batch_size, num_workers=8,
+        dataset, batch_size=batch_size, num_workers=0,
         sampler=train_sampler
         )
     valid_loader = DataLoader(dataset, batch_size=batch_size,
         sampler=valid_sampler, 
-        num_workers=8
+        num_workers=0
         )
     
     if args.emb_type == 'clmr':
