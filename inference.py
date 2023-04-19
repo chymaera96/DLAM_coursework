@@ -136,7 +136,7 @@ def main():
     validation_split = .2
     shuffle_dataset = True
     random_seed= 42
-    n_epochs = 50
+    n_epochs = 200
 
     # embs = torch.load(args.emb_path)
     # print(embs[0].shape)
