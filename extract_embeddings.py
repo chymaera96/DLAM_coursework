@@ -55,3 +55,7 @@ def main():
                                             drop_last=False)
     
     extract(dataloader, model)
+
+
+if __name__ == '__main__':
+    main()
