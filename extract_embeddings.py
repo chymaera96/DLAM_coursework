@@ -41,12 +41,10 @@ def main():
     dataset = NeuralfpDataset(path=args.test_dir, train=False)
     model = SimCLR(encoder=SlowFastNetwork(ResidualUnit, layers=[1,1,1,1])).to(device)
 
-    if os.path.isfile(args.ckp):
-        print("=> loading checkpoint '{}'".format(args.ckp))
-        checkpoint = torch.load(args.ckp)
-        model.load_state_dict(checkpoint['state_dict'])
-    else:
-        print("=> no checkpoint found at '{}'".format(args.ckp))
+    assert os.path.isfile(args.ckp)
+    print("=> loading checkpoint '{}'".format(args.ckp))
+    checkpoint = torch.load(args.ckp)
+    model.load_state_dict(checkpoint['state_dict'])
 
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, 
                                             shuffle=False,
