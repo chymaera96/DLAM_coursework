@@ -29,7 +29,9 @@ def get_num_encodings(index_file):
     label_encoder = LabelEncoder()
     with open(index_file, 'r') as fp:
         filenames = json.load(fp)
-        labels = [f.split('/')[-1].split('.')[0] for f in filenames]
+    if type(filenames) is not list:     #SFNet index is a dictionary
+        filenames = [filenames[str(idx)] for idx in range(len(filenames))]
+    labels = [f.split('/')[-1].split('.')[0] for f in filenames]
     return label_encoder.fit_transform(labels)
 
 
@@ -92,6 +94,7 @@ class ClassificationDataset(Dataset):
             return self[idx + 1]
         
         try:
+            # print(self.embs[0].shape)
             data = self.embs[idx]
         except Exception:
             print("Error loading:" + self.embs[idx])
@@ -133,7 +136,11 @@ def main():
     validation_split = .2
     shuffle_dataset = True
     random_seed= 42
-    n_epochs = 50
+    
+    n_epochs = 200
+
+    # embs = torch.load(args.emb_path)
+    # print(embs[0].shape)
 
     dataset_size = len(dataset)
     indices = list(range(dataset_size))
@@ -159,18 +166,20 @@ def main():
 
 
     train_loader = DataLoader(
-        dataset, batch_size=batch_size, num_workers=8,
+        dataset, batch_size=batch_size, num_workers=0,
+        # shuffle=True,
         sampler=train_sampler
         )
     valid_loader = DataLoader(dataset, batch_size=batch_size,
         sampler=valid_sampler, 
-        num_workers=8
+        # shuffle=False,
+        num_workers=0
         )
     
-    if args.emb_type == 'sfnet':
-        input_dim = 1984
-    elif args.emb_type == 'clmr':
+    if args.emb_type == 'clmr':
         input_dim = 5632
+    elif args.emb_type == 'sfnet':
+        input_dim = 1856
     model = LinearEvaluation(input_dim, 512, 10).to(device)
     criterion   = nn.CrossEntropyLoss()  
     optimizer = optim.Adam(model.parameters(), lr=0.001)
@@ -186,8 +195,8 @@ def main():
 
         t_loss_log.append(train_loss)
         v_loss_log.append(valid_loss)
-        # if valid_loss < best_loss:
-        if epoch == 50:
+        if valid_loss < best_loss:
+        # if epoch == 50:
             best_loss = valid_loss
             
             checkpoint = {
