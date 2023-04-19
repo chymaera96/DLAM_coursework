@@ -62,6 +62,7 @@ def create_fp_db(dataloader, model, output_root_dir, save=True):
         # fp = torch.cat(fp)
     
     arr_shape = (len(fp_db), z_i.shape[-1])
+    print(arr_shape)
     # fp_db = np.concatenate(fp_db, axis=0)
     # fp_q = np.concatenate(fp_db, axis=0)
 
@@ -69,6 +70,7 @@ def create_fp_db(dataloader, model, output_root_dir, save=True):
                     dtype='float32',
                     mode='w+',
                     shape=arr_shape)
+    print(fp_q.shape)
     arr_q[:] = fp_q[:]
     arr_q.flush(); del(arr_q)   #Close memmap
 
