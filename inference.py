@@ -166,12 +166,12 @@ def main():
 
     train_loader = DataLoader(
         dataset, batch_size=batch_size, num_workers=0,
-        shuffle=True,
+        # shuffle=True,
         sampler=train_sampler
         )
     valid_loader = DataLoader(dataset, batch_size=batch_size,
         sampler=valid_sampler, 
-        shuffle=False,
+        # shuffle=False,
         num_workers=0
         )
     
