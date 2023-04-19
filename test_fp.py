@@ -33,6 +33,7 @@ parser.add_argument('--n_dummy_db', default=500, type=int)
 parser.add_argument('--n_query_db', default=20, type=int)
 parser.add_argument('--compute_fp', default=True, type=bool)
 parser.add_argument('--small_test', default=False, type=bool)
+parser.add_argument('--nb', default=False, type=bool)
 
 
 device = torch.device('cuda' if torch.cuda.is_available else 'cpu')
@@ -135,53 +136,69 @@ def main():
     else:
         print("=> no checkpoint found at '{}'".format(args.ckp))
 
+    if not args.nb:
 
-    print("Creating dataloaders ...")
-    dataset = NeuralfpDataset(path=args.test_dir, transform=TransformNeuralfp(ir_dir=ir_dir, noise_dir=noise_dir,sample_rate=22050), train=False)
-
-
-    dataset_size = len(dataset)
-    indices = list(range(dataset_size))
-    split1 = args.n_dummy_db
-    split2 = args.n_query_db
-    if shuffle_dataset :
-        np.random.seed(random_seed)
-        np.random.shuffle(indices)
-    dummy_indices, query_db_indices = indices[:split1], indices[split1: split1 + split2]
-    print(f"Length of indices {len(dummy_indices)} {len(query_db_indices)}")
-
-    dummy_db_sampler = SubsetRandomSampler(dummy_indices)
-    query_db_sampler = SubsetRandomSampler(query_db_indices)
-
-    
-
-    dummy_db_loader = torch.utils.data.DataLoader(dataset, batch_size=1, 
-                                            shuffle=False,
-                                            num_workers=4, 
-                                            pin_memory=True, 
-                                            drop_last=False,
-                                            sampler=dummy_db_sampler)
-    
-    query_db_loader = torch.utils.data.DataLoader(dataset, batch_size=1, 
-                                            shuffle=False,
-                                            num_workers=4, 
-                                            pin_memory=True, 
-                                            drop_last=False,
-                                            sampler=query_db_sampler)
+        print("Creating dataloaders ...")
+        dataset = NeuralfpDataset(path=args.test_dir, transform=TransformNeuralfp(ir_dir=ir_dir, noise_dir=noise_dir,sample_rate=22050), train=False)
 
 
-    if not os.path.exists(args.fp_dir):
-        os.mkdir(args.fp_dir)
+        dataset_size = len(dataset)
+        indices = list(range(dataset_size))
+        split1 = args.n_dummy_db
+        split2 = args.n_query_db
+        if shuffle_dataset :
+            np.random.seed(random_seed)
+            np.random.shuffle(indices)
+        dummy_indices, query_db_indices = indices[:split1], indices[split1: split1 + split2]
+        print(f"Length of indices {len(dummy_indices)} {len(query_db_indices)}")
 
-    if args.compute_fp == True:
-        create_fp_db(query_db_loader, model, args.fp_dir)
-        create_dummy_db(dummy_db_loader, model, args.fp_dir)
+        dummy_db_sampler = SubsetRandomSampler(dummy_indices)
+        query_db_sampler = SubsetRandomSampler(query_db_indices)
 
-    if args.small_test:
-        index_type = 'l2'
+        
+
+        dummy_db_loader = torch.utils.data.DataLoader(dataset, batch_size=1, 
+                                                shuffle=False,
+                                                num_workers=4, 
+                                                pin_memory=True, 
+                                                drop_last=False,
+                                                sampler=dummy_db_sampler)
+        
+        query_db_loader = torch.utils.data.DataLoader(dataset, batch_size=1, 
+                                                shuffle=False,
+                                                num_workers=4, 
+                                                pin_memory=True, 
+                                                drop_last=False,
+                                                sampler=query_db_sampler)
+
+
+        if not os.path.exists(args.fp_dir):
+            os.mkdir(args.fp_dir)
+
+        if args.compute_fp == True:
+            create_fp_db(query_db_loader, model, args.fp_dir)
+            create_dummy_db(dummy_db_loader, model, args.fp_dir)
+
+        if args.small_test:
+            index_type = 'l2'
+        else:
+            index_type = 'ivfpq'
+        eval_faiss(emb_dir=args.fp_dir, test_ids='all', test_seq_len=args.query_lens, index_type=index_type)
+
     else:
-        index_type = 'ivfpq'
-    eval_faiss(emb_dir=args.fp_dir, test_ids='all', test_seq_len=args.query_lens, index_type=index_type)
+
+        print("Creating dataloader ...")
+        dataset = NeuralfpDataset(path='/content/DLAM_coursework/data', train=False)
+
+
+        query_db_loader = torch.utils.data.DataLoader(dataset, batch_size=1, 
+                                                shuffle=False,
+                                                num_workers=0, 
+                                                pin_memory=True, 
+                                                drop_last=False)
+
+        create_fp_db(query_db_loader, model, args.fp_dir)
+        eval_faiss(emb_dir=args.fp_dir, test_ids='all', test_seq_len=args.query_lens, index_type='l2')
 
 
 if __name__ == '__main__':
