@@ -138,6 +138,9 @@ def main():
     random_seed= 42
     n_epochs = 50
 
+    embs = torch.load(args.emb_path)
+    print(embs[0].shape)
+
     dataset_size = len(dataset)
     indices = list(range(dataset_size))
     split1 = int(np.floor(train_split * dataset_size))
