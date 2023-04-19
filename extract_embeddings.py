@@ -25,7 +25,7 @@ def extract(dataloader, model):
 
             with torch.no_grad():
                 _, _, z_i, _= model(x_i,x_i)
-                z_i = z_i.detach()
+                # z_i = z_i.detach()
 
             emb.append(z_i)
 
