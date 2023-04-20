@@ -156,7 +156,7 @@ def main():
     dataset_split["val"] = val_indices
     dataset_split["test"] = test_indices
 
-    with open('data_splits.json','w') as fp:
+    with open(f'data_{args.emb_type}_splits.json','w') as fp:
         json.dump(dataset_split, fp)
 
 
