@@ -298,7 +298,7 @@ def eval_faiss(emb_dir,
     hit_rates = np.stack([top1_exact_rate, top1_near_rate, top3_exact_rate, top10_exact_rate])
     del fake_recon_index, query, db
 
-    print(hit_rates)
+    # print(hit_rates)
     np.save(f'{emb_dir}/hit_rates.npy', hit_rates)
 
     np.save(f'{emb_dir}/raw_score.npy',

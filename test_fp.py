@@ -211,7 +211,12 @@ def main():
         create_dummy_db(query_loader, model, args.fp_dir, fname='query')
         create_dummy_db(db_loader, model, args.fp_dir, fname='db')
 
-        eval_faiss(emb_dir=args.fp_dir, test_ids='all', test_seq_len='1 3 5 8', index_type='l2')
+        hit_rates = eval_faiss(emb_dir=args.fp_dir, test_ids='all', test_seq_len='1 4 6', index_type='l2')
+        print(f'Top-1 exact hit rate = {hit_rates[0]}')
+        print(f'Top-1 near hit rate = {hit_rates[1]}')
+        print(f'Top-3 exact hit rate = {hit_rates[2]}')
+        print(f'Top-10 exact hit rate = {hit_rates[3]}')
+
 
 
 if __name__ == '__main__':
