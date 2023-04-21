@@ -37,7 +37,7 @@ def get_num_encodings(index_file):
     if type(filenames) is not list:     #SFNet index is a dictionary
         filenames = [filenames[str(idx)] for idx in range(len(filenames))]
     labels = [f.split('/')[-1].split('.')[0] for f in filenames]
-    return label_encoder.fit_transform(labels)
+    return labels, label_encoder.fit_transform(labels)
 
 
 
@@ -90,7 +90,7 @@ class ClassificationDataset(Dataset):
         #     pass
         
         self.embs = torch.load(emb_path)
-        self.targets = get_num_encodings(index_path)
+        _, self.targets = get_num_encodings(index_path)
         self.ignore_idx = []
   
         
