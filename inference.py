@@ -18,15 +18,15 @@ root = os.path.dirname(__file__)
 
 parser = argparse.ArgumentParser(description='Inferencing Network')
 parser.add_argument('--ckp', default='', type=str, 
-                    description='Path for model checkpoint')
+                    help='Path for model checkpoint')
 parser.add_argument('--model_dir', default='', type=str,
-                    description='Directory where the trained classifier is to be saved in')
+                    help='Directory where the trained classifier is to be saved in')
 parser.add_argument('--emb_path', default='', type=str,
-                    description='Path for input embeddings')
+                    help='Path for input embeddings')
 parser.add_argument('--index_path', default='', type=str,
-                    description='Index file for dataset (to extract targets)')                
+                    help='Index file for dataset (to extract targets)')                
 parser.add_argument('--emb_type', default='', type=str,
-                    description='Type of input embeddings: sfnet or clmr')
+                    help='Type of input embeddings: sfnet or clmr')
 
 device = torch.device('cuda' if torch.cuda.is_available else 'cpu')
 
