@@ -15,15 +15,20 @@ from torch.utils.data.sampler import SubsetRandomSampler
 # Directories
 root = os.path.dirname(__file__)
 model_folder = os.path.join(root,"checkpoint")
-data_dir = os.path.join(root,"data/fma_8000")
-# json_dir = os.path.join(root,"data/fma_10k.json")
-ir_dir = os.path.join(root,'data/augmentation_datasets/ir_filters')
-noise_dir = os.path.join(root,'data/augmentation_datasets/noise')
+# data_dir = os.path.join(root,"data/fma_8000")
+# ir_dir = os.path.join(root,'data/augmentation_datasets/ir_filters')
+# noise_dir = os.path.join(root,'data/augmentation_datasets/noise')
 
 device = torch.device("cuda")
 
 
 parser = argparse.ArgumentParser(description='Neuralfp Training')
+parser.add_argument('--data_dir', default='', type=str,
+                    help='Path to training data')
+parser.add_argument('--ir_dir', default='', type=str,
+                    help='Path to impulse response data (augmentation)')
+parser.add_argument('--noise_dir', default='', type=str,
+                    help='Path to background noise data (augmentation)')
 parser.add_argument('--epochs', default=500, type=int, metavar='N',
                     help='number of total epochs to run')
 parser.add_argument('--resume', default='', type=str, metavar='PATH',
@@ -32,7 +37,7 @@ parser.add_argument('--seed', default=None, type=int,
                     help='seed for initializing training. ')
 parser.add_argument('--sr', default=22050, type=int,
                     help='Sampling rate ')
-parser.add_argument('--ckp', default='sfnet', type=str, metavar='NAME',
+parser.add_argument('--ckp', default='sfnet', type=str,
                     help='checkpoint_name')
 
 
@@ -90,7 +95,9 @@ def train(train_loader, model, optimizer):
 
 def main():
     args = parser.parse_args()
-    # json_dir = load_index(data_dir)
+    data_dir = args.data_dir
+    ir_dir = args.ir_dir
+    noise_dir = args.noise_dir
     
     # Hyperparameters
     batch_size = 120
@@ -100,45 +107,24 @@ def main():
     model_name = args.ckp
     random_seed = 42
 
-    # sub_dir = create_train_set(data_dir)
-    # print(sub_dir)
     print(ir_dir)
     print(noise_dir)
     assert data_dir == os.path.join(root,"data/fma_8000")
 
     print("Loading dataset...")
     train_dataset = NeuralfpDataset(path=data_dir, transform=TransformNeuralfp(ir_dir=ir_dir, noise_dir=noise_dir,sample_rate=sample_rate), train=True)
-    # validation_dataset = NeuralfpDataset(path=data_dir, transform=TransformNeuralfp(ir_dir=ir_dir, noise_dir=noise_dir,sample_rate=sample_rate), train=True)
-
-    # dataset_size = len(train_dataset)
-    # indices = list(range(dataset_size))
-    # split = int(np.floor(validation_split * dataset_size))
-    # if shuffle_dataset :
-    #     np.random.seed(random_seed)
-    #     np.random.shuffle(indices)
-    # train_indices, val_indices = indices[split:], indices[:split]
-
-    # train_sampler = SubsetRandomSampler(train_indices)
-    # valid_sampler = SubsetRandomSampler(val_indices)
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=batch_size, shuffle=True,
         num_workers=4, pin_memory=True, drop_last=True)
-        # sampler=train_sampler)
-    
-    # validation_loader = torch.utils.data.DataLoader(
-    #     validation_dataset, batch_size=1, shuffle=False,
-    #     num_workers=4, pin_memory=True,
-    #     sampler=valid_sampler)
+
     
     
     print("Creating new model...")
     model = SimCLR(encoder=SlowFastNetwork(ResidualUnit, layers=[1,1,1,1])).to(device)
-    # model = nn.DataParallel(model).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max = 500, eta_min = 1e-7)
-    # criterion = NT_Xent(batch_size, temperature = 0.1)
 
        
     if args.resume:
