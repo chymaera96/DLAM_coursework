@@ -47,7 +47,7 @@ def save_ckp(state,epoch,model_name,model_folder):
     if not os.path.exists(model_folder): 
         print("Creating checkpoint directory...")
         os.mkdir(model_folder)
-    torch.save(state, "{}/model_{}_epoch_{}.pth".format(model_folder,model_name,epoch))
+    torch.save(state, "{}/model_{}_epoch_{}.pth".format(model_folder, model_name, epoch))
 
 
 def create_train_set(data_dir, size=8000):
