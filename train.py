@@ -3,14 +3,16 @@ import numpy as np
 import argparse
 import torch
 import torch.nn.functional as F
+from torch.utils.data.sampler import SubsetRandomSampler
+
 
 from util import load_ckp, save_ckp, create_train_set
 from sfnet.transformations import TransformNeuralfp
 from sfnet.data import NeuralfpDataset
 from sfnet.modules.simclr import SimCLR
 from sfnet.modules.residual import SlowFastNetwork, ResidualUnit
-from torch.utils.data.sampler import SubsetRandomSampler
-
+from eval import eval_faiss
+from test_fp import create_fp_db, create_dummy_db
 
 # Directories
 root = os.path.dirname(__file__)
@@ -92,6 +94,9 @@ def train(train_loader, model, optimizer):
         loss_epoch += loss.item()
     return loss_epoch
 
+def validate(valid_loader, model, output_root_dir):
+
+    return
 
 def main():
     args = parser.parse_args()

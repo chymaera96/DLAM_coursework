@@ -27,6 +27,36 @@ def load_index(data_dir, ext=['wav','mp3'], max_len=4000):
     assert len(dataset) > 0
     return dataset
 
+def load_augmentation_index(data_dir, splits, ext=['wav','mp3'], shuffle_dataset=True):
+    dataset = {'train' : [], 'test' : [], 'validate': []}
+    json_path = os.path.join(data_dir, data_dir.split('/')[-1] + ".json")
+    if not os.path.exists(json_path):
+        fpaths = glob.glob(os.path.join(data_dir,'**/*.*'), recursive=True)
+        fpaths = [p for p in fpaths if p.split('.')[-1] in ext]
+        dataset_size = len(fpaths)   
+        indices = list(range(dataset_size))
+        if shuffle_dataset :
+            np.random.seed(42)
+            np.random.shuffle(indices)
+        if type(splits) == list or type(splits) == np.ndarray:
+            splits = [splits[ix]*dataset_size for ix in range(len(splits))]
+            train_idxs, valid_idxs, test_idxs = indices[:splits[0]], indices[splits[0]: splits[0] + splits[1]], indices[splits[1]:]
+            dataset['validate'] = [fpaths[ix] for ix in valid_idxs]
+        else:
+            splits = splits*dataset_size
+            train_idxs, test_idxs = indices[:splits], indices[splits:]
+        
+        dataset['train'] = [fpaths[ix] for ix in train_idxs]
+        dataset['test'] = [fpaths[ix] for ix in test_idxs]
+    
+    else:
+        with open(json_path, 'r') as fp:
+            dataset = json.load(fp)
+
+    return dataset
+    
+
+
 def get_frames(y, frame_length, hop_length):
     # frames = librosa.util.frame(y.numpy(), frame_length, hop_length, axis=0)
     frames = y.unfold(0, size=frame_length, step=hop_length)
