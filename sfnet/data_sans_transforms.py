@@ -74,12 +74,7 @@ class NeuralfpDataset(Dataset):
         
         #   For validation / test, output consecutive (overlapping) frames
         else:
-            frame_length = int(SAMPLE_RATE*clip_len)
-            hop_length = int(SAMPLE_RATE*clip_len/2)
-            framed_audio = get_frames(audio_resampled, frame_length, hop_length)
-            assert len(framed_audio) > 0 
-
-            return framed_audio
+            return audio_resampled
     
     def __len__(self):
         return len(self.filenames)

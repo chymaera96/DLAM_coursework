@@ -80,6 +80,21 @@ def save_ckp(state,epoch,model_name,model_folder):
     torch.save(state, "{}/model_{}_epoch_{}.pth".format(model_folder, model_name, epoch))
 
 
+def create_fp_dir(resume=None, ckp=None):
+    parent_dir = 'logs/emb'
+    if not os.path.exists(parent_dir):
+        os.makedirs(parent_dir)
+    if resume is not None:
+        ckp_name = resume.split('/')[-1].split('.pt')[0]
+    else:
+        ckp_name = f'model_{ckp}_epoch_0'
+    fp_dir = os.path.join(parent_dir, ckp_name)
+    if not os.path.exists(fp_dir):
+        os.mkdir(fp_dir)
+    return fp_dir
+
+
+
 def create_train_set(data_dir, size=8000):
     dest = os.path.join(data_dir, f'fma_{size}')
     if not os.path.exists(dest):

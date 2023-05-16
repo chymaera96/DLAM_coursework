@@ -38,24 +38,33 @@ parser.add_argument('--nb', default=False, type=bool)
 
 device = torch.device('cuda' if torch.cuda.is_available else 'cpu')
 
-def create_fp_db(dataloader, model, output_root_dir, save=True):
+def create_fp_db(dataloader, augment, model, output_root_dir, save=True):
     fp_q = []
     fp_db = []
     print("=> Creating query and db fingerprints...")
-    for idx, (db,q) in enumerate(dataloader):
-        splits = zip(db[0], q[0])
-        for x_i, x_j in splits:
-            x_i = torch.unsqueeze(x_i,0).to(device)
-            x_j = torch.unsqueeze(x_j,0).to(device)
+    for idx, audio in enumerate(dataloader):
+        audio = audio.to(device)
+        db, q = augment(audio, audio)
+        # splits = zip(db[0], q[0])
+        # for x_i, x_j in splits:
+        #     x_i = torch.unsqueeze(x_i,0)
+        #     x_j = torch.unsqueeze(x_j,0)
 
-            with torch.no_grad():
-                _, _, z_i, z_j= model(x_i,x_j)
+        #     with torch.no_grad():
+        #         _, _, z_i, z_j= model(x_i,x_j)
 
-            z_i = z_i.detach().cpu().numpy()
-            z_j = z_j.detach().cpu().numpy()
+        #     z_i = z_i.detach().cpu().numpy()
+        #     z_j = z_j.detach().cpu().numpy()
 
-            fp_db.append(z_i)
-            fp_q.append(z_j)
+        #     fp_db.append(z_i)
+        #     fp_q.append(z_j)
+        x_i = torch.unsqueeze(db[0],1)
+        x_j = torch.unsqueeze(q[0],1)
+        with torch.no_grad():
+            _, _, z_i, z_j= model(x_i,x_j)        
+
+        fp_db.append(z_i.detach().cpu().numpy())
+        fp_q.append(z_j.detach().cpu().numpy())
 
         if idx % 10 == 0:
             print(f"Step [{idx}/{len(dataloader)}]\t shape: {z_i.shape}")
@@ -87,28 +96,33 @@ def create_fp_db(dataloader, model, output_root_dir, save=True):
 
     np.save(f'{output_root_dir}/db_shape.npy', arr_shape)
 
-def create_dummy_db(dataloader, model, output_root_dir, fname='dummy_db', save=True):
+def create_dummy_db(dataloader, augment, model, output_root_dir, fname='dummy_db', save=True):
     fp = []
     print("=> Creating dummy fingerprints...")
-    for idx, (db,q) in enumerate(dataloader):
-        splits = zip(db[0], q[0])
-        for x_i, x_j in splits:
-            x_i = torch.unsqueeze(x_i,0).to(device)
+    for idx, audio in enumerate(dataloader):
+        audio = audio.to(device)
+        db, q = augment(audio, audio)
+        # for x_i, x_j in splits:
+        #     x_i = torch.unsqueeze(x_i,0).to(device)
 
-            with torch.no_grad():
-                _, _, z_i, _= model(x_i,x_i)
+        #     with torch.no_grad():
+        #         _, _, z_i, _= model(x_i,x_i)
 
-            z_i = z_i.detach().cpu().numpy()
+        #     z_i = z_i.detach().cpu().numpy()
 
-            fp.append(z_i)
+        #     fp.append(z_i)
+        x_i = torch.unsqueeze(db[0],1)
+        with torch.no_grad():
+            _, _, z_i, _= model(x_i,x_i)        
 
+        fp.append(z_i.detach().cpu().numpy())
+        
         if idx % 10 == 0:
             print(f"Step [{idx}/{len(dataloader)}]\t shape: {z_i.shape}")
         # fp = torch.cat(fp)
     
     arr_shape = (len(fp), z_i.shape[-1])
     fp = np.concatenate(fp)
-    # fp_q = np.concatenate(fp_db, axis=0)
 
     arr = np.memmap(f'{output_root_dir}/{fname}.mm',
                     dtype='float32',

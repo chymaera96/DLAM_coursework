@@ -4,17 +4,17 @@ from torch_audiomentations import Compose,AddBackgroundNoise, ApplyImpulseRespon
 from torchaudio.transforms import MelSpectrogram, TimeMasking, FrequencyMasking, AmplitudeToDB
 import warnings
 
-class TransformNeuralfp(nn.Module):
+class GPUTransformNeuralfp(nn.Module):
     
     def __init__(self, ir_dir, noise_dir, sample_rate, n_frames=240, train=True):
-        super(TransformNeuralfp, self).__init__()
+        super(GPUTransformNeuralfp, self).__init__()
         self.sample_rate = sample_rate
         self.ir_dir = ir_dir
         self.n_frames = n_frames
         self.train = train
         self.train_transform = Compose([
             ApplyImpulseResponse(ir_path=self.ir_dir, p=0.5, leave_length_unchanged=True),
-            AddBackgroundNoise(sounds_path=noise_dir, min_snr_in_db=0, max_snr_in_db=20,p=0.8),
+            AddBackgroundNoise(sounds_path=noise_dir, min_snr_in_db=0, max_snr_in_db=10,p=0.8),
             ])
         
         self.logmelspec = nn.Sequential(
