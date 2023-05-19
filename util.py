@@ -98,10 +98,13 @@ def create_fp_dir(resume=None, ckp=None):
 def create_train_set(data_dir, dest, size=10000):
     if not os.path.exists(dest):
         os.mkdir(dest)
+        print(data_dir)
+        print(dest)
     for ix,fname in enumerate(os.listdir(data_dir)):
         fpath = os.path.join(data_dir, fname)
         if ix <= size and fpath.endswith('mp3'):
             shutil.move(fpath,dest)
+            print(ix)
         if len(os.listdir(dest)) >= size:
             return dest
     
