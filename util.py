@@ -130,7 +130,7 @@ def create_downstream_set(data_dir, size=5000):
 
 
 def main():
-    data_dir = '../datasets/'
+    data_dir = 'data '
     dest = 'data/fma_8000'
     create_train_set(data_dir, dest)
 
