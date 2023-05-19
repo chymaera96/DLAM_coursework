@@ -95,11 +95,9 @@ def create_fp_dir(resume=None, ckp=None):
 
 
 
-def create_train_set(data_dir, size=8000):
-    dest = os.path.join(data_dir, f'fma_{size}')
+def create_train_set(data_dir, dest, size=10000):
     if not os.path.exists(dest):
         os.mkdir(dest)
-
     for ix,fname in enumerate(os.listdir(data_dir)):
         fpath = os.path.join(data_dir, fname)
         if ix <= size and fpath.endswith('mp3'):
@@ -125,3 +123,14 @@ def create_downstream_set(data_dir, size=5000):
             shutil.move(fpath,dest)
 
     return dest
+
+
+
+def main():
+    data_dir = '../datasets/'
+    dest = 'data/fma_8000'
+    create_train_set(data_dir, dest)
+
+
+if __name__ == '__main__':
+    main()
