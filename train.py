@@ -167,8 +167,8 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max = 500, eta_min = 3e-5)
     print("Intializing augmentation pipeline...")
-    noise_idx = load_augmentation_index(noise_dir, splits=[0.6,0.2,0.2])
-    ir_idx = load_augmentation_index(ir_dir, splits=[0.6,0.2,0.2])
+    noise_idx = load_augmentation_index(noise_dir, splits=[0.6,0.2,0.2])["train"]
+    ir_idx = load_augmentation_index(ir_dir, splits=[0.6,0.2,0.2])["train"]
     augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=args.sr).to(device)
        
     if args.resume:
