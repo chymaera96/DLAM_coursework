@@ -39,7 +39,7 @@ def load_augmentation_index(data_dir, splits, ext=['wav','mp3'], shuffle_dataset
             np.random.seed(42)
             np.random.shuffle(indices)
         if type(splits) == list or type(splits) == np.ndarray:
-            splits = [splits[ix]*dataset_size for ix in range(len(splits))]
+            splits = [int(splits[ix]*dataset_size) for ix in range(len(splits))]
             train_idxs, valid_idxs, test_idxs = indices[:splits[0]], indices[splits[0]: splits[0] + splits[1]], indices[splits[1]:]
             dataset['validate'] = [fpaths[ix] for ix in valid_idxs]
         else:
