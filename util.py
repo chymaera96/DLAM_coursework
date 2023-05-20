@@ -54,7 +54,7 @@ def load_augmentation_index(data_dir, splits, ext=['wav','mp3'], shuffle_dataset
         with open(json_path, 'r') as fp:
             dataset = json.load(fp)
 
-    print(dataset)
+    # print(dataset)
     return dataset
     
 
