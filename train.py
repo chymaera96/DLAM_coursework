@@ -187,7 +187,7 @@ def main():
 
 
     print("Calculating initial loss ...")
-    best_loss = train(train_loader, model, optimizer)
+    best_loss = train(train_loader, augment, model, optimizer)
 
     # training
     model.train()
