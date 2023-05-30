@@ -2,6 +2,7 @@ import os
 import numpy as np
 import argparse
 import torch
+import gc
 import torch.nn.functional as F
 from torch.utils.data.sampler import SubsetRandomSampler
 
@@ -71,11 +72,12 @@ def ntxent_loss(z_i, z_j, tau=0.05):
     loss = torch.sum(Ls) / -z.shape[0]
     return loss
 
-def train(train_loader, augment, model, optimizer):
+def train(train_loader, model, optimizer, ir_idx, noise_idx, sr):
     loss_epoch = 0
     for idx, (x_i, x_j) in enumerate(train_loader):
 
         # print(f"Inside train function x_i, x_j {x_i.shape} {x_j.shape}")
+        augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=sr).to(device)
         optimizer.zero_grad()
         x_i = x_i.to(device)
         x_j = x_j.to(device)
@@ -94,9 +96,11 @@ def train(train_loader, augment, model, optimizer):
 
         if idx % 10 == 0:
             print(f"Step [{idx}/{len(train_loader)}]\t Loss: {loss.item()}")
-      
-
+            del augment
+            gc.collect()
+            torch.cuda.empty_cache()
         loss_epoch += loss.item()
+
     return loss_epoch
 
 def validate(query_loader, dummy_loader, augment, model, output_root_dir):
@@ -189,13 +193,13 @@ def main():
 
 
     print("Calculating initial loss ...")
-    best_loss = train(train_loader, augment, model, optimizer)
+    best_loss = train(train_loader, model, optimizer, ir_idx, noise_idx, args.sr)
 
     # training
     model.train()
     for epoch in range(start_epoch+1, num_epochs+1):
         print("#######Epoch {}#######".format(epoch))
-        loss_epoch = train(train_loader, augment, model, optimizer)
+        loss_epoch = train(train_loader, model, optimizer, ir_idx, noise_idx, args.sr)
         hit_rates = validate(query_loader, dummy_loader, augment, model, output_root_dir)
         loss_log.append(loss_epoch)
         hit_rate_log.append(hit_rates[0])
