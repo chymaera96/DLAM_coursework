@@ -75,12 +75,12 @@ def train(train_loader, augment, model, optimizer):
     loss_epoch = 0
     for idx, (x_i, x_j) in enumerate(train_loader):
 
-        print(f"Inside train function x_i, x_j {x_i.shape} {x_j.shape}")
+        # print(f"Inside train function x_i, x_j {x_i.shape} {x_j.shape}")
         optimizer.zero_grad()
         x_i = x_i.to(device)
         x_j = x_j.to(device)
         x_i, x_j = augment(x_i, x_j)
-        print(f"Output from augmenter x_i, x_j {x_i.shape} {x_j.shape}")
+        # print(f"Output from augmenter x_i, x_j {x_i.shape} {x_j.shape}")
 
         # positive pair, with encoding
         h_i, h_j, z_i, z_j = model(x_i, x_j)
