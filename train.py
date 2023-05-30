@@ -117,7 +117,7 @@ def main():
     noise_dir = args.noise_dir
     
     # Hyperparameters
-    batch_size = 64
+    batch_size = 32
     learning_rate = 1e-4
     num_epochs = args.epochs
     sample_rate = args.sr
@@ -133,7 +133,7 @@ def main():
     train_dataset = NeuralfpDataset(path=train_dir, train=True)
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=batch_size, shuffle=True,
-        num_workers=8, pin_memory=True, drop_last=True)
+        num_workers=4, pin_memory=True, drop_last=True)
     
     valid_dataset = NeuralfpDataset(path=valid_dir, train=False)
     print("Creating validation dataloaders...")
