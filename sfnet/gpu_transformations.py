@@ -13,7 +13,7 @@ class GPUTransformNeuralfp(nn.Module):
         self.n_frames = n_frames
         self.train = train
         self.train_transform = Compose([
-            # ApplyImpulseResponse(ir_paths=self.ir_dir, p=0.5),
+            ApplyImpulseResponse(ir_paths=self.ir_dir, p=0.5),
             AddBackgroundNoise(background_paths=noise_dir, min_snr_in_db=0, max_snr_in_db=10,p=0.8),
             ])
         
