@@ -74,7 +74,7 @@ class NeuralfpDataset(Dataset):
         
         #   For validation / test, output consecutive (overlapping) frames
         else:
-            return audio_resampled
+            return torch.unsqueeze(audio_resampled, 0)
     
     def __len__(self):
         return len(self.filenames)
