@@ -39,7 +39,7 @@ class GPUTransformNeuralfp(nn.Module):
             x_j = self.train_transform(x_j, sample_rate=self.sample_rate)
             X_j = self.logmelspec(x_j)
             X_j = self.spec_aug(X_j)
-            X_j = F.pad(X_j, (self.n_frames - X_j.size(-1), 0))       
+            X_j = F.pad(X_j, (self.n_frames - X_j.size(-1), 0)) 
 
 
             return X_i.permute(0,1,3,2), X_j.permute(0,1,3,2)
