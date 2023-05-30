@@ -122,7 +122,7 @@ def main():
     noise_dir = args.noise_dir
     
     # Hyperparameters
-    batch_size = 64
+    batch_size = 120
     learning_rate = 1e-4
     num_epochs = args.epochs
     sample_rate = args.sr
