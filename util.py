@@ -3,6 +3,7 @@ import torch
 import numpy as np
 import json
 import glob
+import soundfile as sf
 import shutil
 
 def load_index(data_dir, ext=['wav','mp3'], max_len=4000):
@@ -129,12 +130,17 @@ def create_downstream_set(data_dir, size=5000):
 
     return dest
 
+def preprocess_aug_set_sr(data_dir, sr=22050):
+    for fpath in glob.iglob(os.path.join(data_dir,'**/*.wav'), recursive=True):
+        y, sr = sf.read(fpath)
+        sf.write(fpath, data=y, samplerate=sr)
+    return
+
 
 
 def main():
-    data_dir = 'data'
-    dest = 'data/fma_8000'
-    create_train_set(data_dir, dest)
+    data_dir = 'data/augmentation_datasets/ir_filters'
+    preprocess_aug_set_sr(data_dir)
 
 
 if __name__ == '__main__':
