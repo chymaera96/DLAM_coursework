@@ -77,7 +77,7 @@ def train(train_loader, model, optimizer, ir_idx, noise_idx, sr):
     for idx, (x_i, x_j) in enumerate(train_loader):
 
         # print(f"Inside train function x_i, x_j {x_i.shape} {x_j.shape}")
-        augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=sr).to(device)
+        # augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=sr).to(device)
         optimizer.zero_grad()
         x_i = x_i.to(device)
         x_j = x_j.to(device)
@@ -97,6 +97,7 @@ def train(train_loader, model, optimizer, ir_idx, noise_idx, sr):
         if idx % 10 == 0:
             print(f"Step [{idx}/{len(train_loader)}]\t Loss: {loss.item()}")
             del augment
+            augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=sr).to(device)
             gc.collect()
             torch.cuda.empty_cache()
         loss_epoch += loss.item()
