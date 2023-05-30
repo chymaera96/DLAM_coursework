@@ -133,7 +133,9 @@ def create_downstream_set(data_dir, size=5000):
 def preprocess_aug_set_sr(data_dir, sr=22050):
     for fpath in glob.iglob(os.path.join(data_dir,'**/*.wav'), recursive=True):
         y, sr = sf.read(fpath)
-        sf.write(fpath, data=y, samplerate=sr)
+        print(sr)
+        break
+        # sf.write(fpath, data=y, samplerate=sr)
     return
 
 
