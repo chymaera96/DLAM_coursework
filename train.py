@@ -79,7 +79,6 @@ def train(train_loader, model, optimizer, ir_idx, noise_idx, sr, augment=None):
 
     for idx, (x_i, x_j) in enumerate(train_loader):
 
-        # augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=sr).to(device)
         # print(f"Inside train function x_i, x_j {x_i.shape} {x_j.shape}")
         optimizer.zero_grad()
         x_i = x_i.to(device)
@@ -135,7 +134,8 @@ def main():
     # assert data_dir == os.path.join(root,"data/fma_8000")
 
     print("Loading dataset...")
-    train_dataset = NeuralfpDataset(path=train_dir, train=True)
+    cpu_augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=args.sr, cpu=True)
+    train_dataset = NeuralfpDataset(path=train_dir, train=True, transform=cpu_augment)
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=batch_size, shuffle=True,
         num_workers=0, pin_memory=True, drop_last=True)
@@ -176,7 +176,7 @@ def main():
     print("Intializing augmentation pipeline...")
     noise_idx = load_augmentation_index(noise_dir, splits=[0.6,0.2,0.2])["train"]
     ir_idx = load_augmentation_index(ir_dir, splits=[0.6,0.2,0.2])["train"]
-    augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=args.sr).to(device)
+    gpu_augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=args.sr).to(device)
        
     if args.resume:
         if os.path.isfile(args.resume):
@@ -194,14 +194,14 @@ def main():
 
 
     print("Calculating initial loss ...")
-    best_loss = train(train_loader, model, optimizer, ir_idx, noise_idx, args.sr, augment)
+    best_loss = train(train_loader, model, optimizer, ir_idx, noise_idx, args.sr, gpu_augment)
 
     # training
     model.train()
     for epoch in range(start_epoch+1, num_epochs+1):
         print("#######Epoch {}#######".format(epoch))
-        loss_epoch = train(train_loader, model, optimizer, ir_idx, noise_idx, args.sr, augment)
-        hit_rates = validate(query_loader, dummy_loader, augment, model, output_root_dir)
+        loss_epoch = train(train_loader, model, optimizer, ir_idx, noise_idx, args.sr, gpu_augment)
+        hit_rates = validate(query_loader, dummy_loader, gpu_augment, model, output_root_dir)
         loss_log.append(loss_epoch)
         hit_rate_log.append(hit_rates[0])
         if loss_epoch < best_loss:

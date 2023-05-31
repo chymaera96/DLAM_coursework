@@ -70,6 +70,9 @@ class NeuralfpDataset(Dataset):
             x_i = clip[ri:ri+clip_frames]
             x_j = clip[rj:rj+clip_frames]
 
+            if self.transform is not None:
+                x_i, x_j = self.transform(x_i, x_j)
+
             return torch.unsqueeze(x_i, 0), torch.unsqueeze(x_j, 0)
         
         #   For validation / test, output consecutive (overlapping) frames
