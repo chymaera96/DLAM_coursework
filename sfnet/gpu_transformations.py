@@ -23,6 +23,11 @@ class GPUTransformNeuralfp(nn.Module):
             # AddBackgroundNoise(background_paths=noise_dir, min_snr_in_db=0, max_snr_in_db=10,p=0.8),
             ])
         
+        self.val_transform = Compose([
+            ApplyImpulseResponse(ir_paths=self.ir_dir, p=0.5),
+            AddBackgroundNoise(background_paths=noise_dir, min_snr_in_db=0, max_snr_in_db=10,p=0.8),
+            ])
+        
         self.logmelspec = nn.Sequential(
             MelSpectrogram(sample_rate=22050, win_length=740, hop_length=185, n_fft=740, n_mels=128),
             AmplitudeToDB()
@@ -44,7 +49,7 @@ class GPUTransformNeuralfp(nn.Module):
             X_i = self.spec_aug(X_i)
             X_i = F.pad(X_i, (self.n_frames - X_i.size(-1), 0))
 
-            x_j = self.gpu_transform(x_j, sample_rate=self.sample_rate)
+            x_j = self.val_transform(x_j, sample_rate=self.sample_rate)
             X_j = self.logmelspec(x_j)
             X_j = self.spec_aug(X_j)
             X_j = F.pad(X_j, (self.n_frames - X_j.size(-1), 0)) 

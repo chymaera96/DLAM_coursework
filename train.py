@@ -40,7 +40,7 @@ parser.add_argument('--seed', default=None, type=int,
                     help='seed for initializing training. ')
 parser.add_argument('--sr', default=22050, type=int,
                     help='Sampling rate ')
-parser.add_argument('--ckp', default='sfnet', type=str,
+parser.add_argument('--ckp', default='sfnet_config0', type=str,
                     help='checkpoint_name')
 parser.add_argument('--n_dummy_db', default=500, type=int)
 parser.add_argument('--n_query_db', default=20, type=int)
@@ -104,8 +104,8 @@ def train(train_loader, model, optimizer, ir_idx, noise_idx, sr, augment=None):
     return loss_epoch
 
 def validate(query_loader, dummy_loader, augment, model, output_root_dir):
-    create_dummy_db(dummy_loader, augment=augment, model=model, output_root_dir=output_root_dir)
-    create_fp_db(query_loader, augment=augment, model=model, output_root_dir=output_root_dir)
+    create_dummy_db(dummy_loader, augment=augment, model=model, output_root_dir=output_root_dir, verbose=True)
+    create_fp_db(query_loader, augment=augment, model=model, output_root_dir=output_root_dir, verbose=False)
     hit_rates = eval_faiss(emb_dir=output_root_dir, test_ids='all')
     print("-------Validation hit-rates-------")
     print(f'Top-1 exact hit rate = {hit_rates[0]}')
@@ -134,10 +134,13 @@ def main():
     # assert data_dir == os.path.join(root,"data/fma_8000")
 
     print("Intializing augmentation pipeline...")
-    noise_idx = load_augmentation_index(noise_dir, splits=[0.6,0.2,0.2])["train"]
-    ir_idx = load_augmentation_index(ir_dir, splits=[0.6,0.2,0.2])["train"]
-    gpu_augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=args.sr).to(device)
-    cpu_augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=args.sr, cpu=True)
+    noise_train_idx = load_augmentation_index(noise_dir, splits=[0.6,0.2,0.2])["train"]
+    ir_train_idx = load_augmentation_index(ir_dir, splits=[0.6,0.2,0.2])["train"]
+    noise_val_idx = load_augmentation_index(noise_dir, splits=[0.6,0.2,0.2])["validate"]
+    ir_val_idx = load_augmentation_index(ir_dir, splits=[0.6,0.2,0.2])["validate"]
+    gpu_augment = GPUTransformNeuralfp(ir_dir=ir_train_idx, noise_dir=noise_train_idx, sample_rate=args.sr, train=True).to(device)
+    cpu_augment = GPUTransformNeuralfp(ir_dir=ir_train_idx, noise_dir=noise_train_idx, sample_rate=args.sr, cpu=True)
+    val_augment = GPUTransformNeuralfp(ir_dir=ir_val_idx, noise_dir=noise_val_idx, sample_rate=args.sr, train=False).to(device)
 
     print("Loading dataset...")
     train_dataset = NeuralfpDataset(path=train_dir, train=True, transform=cpu_augment)
@@ -195,14 +198,14 @@ def main():
 
 
     print("Calculating initial loss ...")
-    best_loss = train(train_loader, model, optimizer, ir_idx, noise_idx, args.sr, gpu_augment)
+    best_loss = train(train_loader, model, optimizer, ir_train_idx, noise_train_idx, args.sr, gpu_augment)
 
     # training
     model.train()
     for epoch in range(start_epoch+1, num_epochs+1):
         print("#######Epoch {}#######".format(epoch))
-        loss_epoch = train(train_loader, model, optimizer, ir_idx, noise_idx, args.sr, gpu_augment)
-        hit_rates = validate(query_loader, dummy_loader, gpu_augment, model, output_root_dir)
+        loss_epoch = train(train_loader, model, optimizer, ir_train_idx, noise_train_idx, args.sr, gpu_augment)
+        hit_rates = validate(query_loader, dummy_loader, val_augment, model, output_root_dir)
         loss_log.append(loss_epoch)
         hit_rate_log.append(hit_rates[0])
         if loss_epoch < best_loss:
