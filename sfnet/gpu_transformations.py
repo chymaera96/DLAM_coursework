@@ -35,7 +35,7 @@ class GPUTransformNeuralfp(nn.Module):
     def forward(self, x_i, x_j):
 
         if self.cpu:
-            x_j = self.cpu_transform(x_j.view(1,1,x_j.shape[-1]))
+            x_j = self.cpu_transform(x_j.view(1,1,x_j.shape[-1]), sample_rate=self.sample_rate)
             return x_i, x_j.flatten()
 
 
