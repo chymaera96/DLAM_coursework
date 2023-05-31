@@ -74,11 +74,10 @@ def ntxent_loss(z_i, z_j, tau=0.05):
 
 def train(train_loader, model, optimizer, ir_idx, noise_idx, sr):
     loss_epoch = 0
-    augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=sr).to(device)
     for idx, (x_i, x_j) in enumerate(train_loader):
 
+        augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=sr).to(device)
         # print(f"Inside train function x_i, x_j {x_i.shape} {x_j.shape}")
-        # augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=sr).to(device)
         optimizer.zero_grad()
         x_i = x_i.to(device)
         x_j = x_j.to(device)
@@ -97,12 +96,12 @@ def train(train_loader, model, optimizer, ir_idx, noise_idx, sr):
 
         if idx % 10 == 0:
             print(f"Step [{idx}/{len(train_loader)}]\t Loss: {loss.item()}")
-            del augment
-            gc.collect()
-            torch.cuda.empty_cache()
-            augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=sr).to(device)
+
 
         loss_epoch += loss.item()
+        del augment
+        gc.collect()
+        torch.cuda.empty_cache()
 
     return loss_epoch
 
