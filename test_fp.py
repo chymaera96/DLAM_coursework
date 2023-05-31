@@ -57,18 +57,16 @@ def create_fp_db(dataloader, augment, model, output_root_dir, verbose=True):
             print(f"Step [{idx}/{len(dataloader)}]\t shape: {z_i.shape}")
         # fp = torch.cat(fp)
     
-    arr_shape = (len(fp_db), z_i.shape[-1])
-    print(arr_shape)
     fp_db = np.concatenate(fp_db)
-    # print(fp_db.shape)
     fp_q = np.concatenate(fp_q)
+    arr_shape = (len(fp_db), z_i.shape[-1])
+
 
     arr_q = np.memmap(f'{output_root_dir}/query.mm',
                     dtype='float32',
                     mode='w+',
                     shape=arr_shape)
-    print(len(fp_q))
-    # print(fp_q[:])
+    
     arr_q[:] = fp_q[:]
     arr_q.flush(); del(arr_q)   #Close memmap
 
@@ -99,8 +97,8 @@ def create_dummy_db(dataloader, augment, model, output_root_dir, fname='dummy_db
             print(f"Step [{idx}/{len(dataloader)}]\t shape: {z_i.shape}")
         # fp = torch.cat(fp)
     
-    arr_shape = (len(fp), z_i.shape[-1])
     fp = np.concatenate(fp)
+    arr_shape = (len(fp), z_i.shape[-1])
 
     arr = np.memmap(f'{output_root_dir}/{fname}.mm',
                     dtype='float32',
