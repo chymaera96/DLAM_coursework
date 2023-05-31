@@ -100,6 +100,7 @@ def train(train_loader, model, optimizer, ir_idx, noise_idx, sr, augment=None):
         # del augment
         # gc.collect()
         # torch.cuda.empty_cache()
+        break
 
     return loss_epoch
 

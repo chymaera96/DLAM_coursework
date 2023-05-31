@@ -58,6 +58,7 @@ class GPUTransformNeuralfp(nn.Module):
             return X_i.permute(0,1,3,2), X_j.permute(0,1,3,2)
         
         else:
+            print(x_i.shape)
             X_i = self.logmelspec(x_i).permute(2,0,1)
             X_i = X_i.unfold(0, size=self.n_frames, step=self.n_frames//2).permute(1,0,3,2)
 
