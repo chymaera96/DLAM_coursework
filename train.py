@@ -72,11 +72,14 @@ def ntxent_loss(z_i, z_j, tau=0.05):
     loss = torch.sum(Ls) / -z.shape[0]
     return loss
 
-def train(train_loader, model, optimizer, ir_idx, noise_idx, sr):
+def train(train_loader, model, optimizer, ir_idx, noise_idx, sr, augment=None):
     loss_epoch = 0
+    if augment is None:
+        augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=sr).to(device)
+
     for idx, (x_i, x_j) in enumerate(train_loader):
 
-        augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=sr).to(device)
+        # augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=sr).to(device)
         # print(f"Inside train function x_i, x_j {x_i.shape} {x_j.shape}")
         optimizer.zero_grad()
         x_i = x_i.to(device)
@@ -87,11 +90,7 @@ def train(train_loader, model, optimizer, ir_idx, noise_idx, sr):
         # positive pair, with encoding
         h_i, h_j, z_i, z_j = model(x_i, x_j)
         loss = ntxent_loss(z_i, z_j)
-
-        # if torch.count_nonzero(torch.isnan(loss)) > 0:
-        #     print(z_i)
         loss.backward()
-
         optimizer.step()
 
         if idx % 10 == 0:
@@ -99,9 +98,9 @@ def train(train_loader, model, optimizer, ir_idx, noise_idx, sr):
 
 
         loss_epoch += loss.item()
-        del augment
-        gc.collect()
-        torch.cuda.empty_cache()
+        # del augment
+        # gc.collect()
+        # torch.cuda.empty_cache()
 
     return loss_epoch
 
@@ -195,13 +194,13 @@ def main():
 
 
     print("Calculating initial loss ...")
-    best_loss = train(train_loader, model, optimizer, ir_idx, noise_idx, args.sr)
+    best_loss = train(train_loader, model, optimizer, ir_idx, noise_idx, args.sr, augment)
 
     # training
     model.train()
     for epoch in range(start_epoch+1, num_epochs+1):
         print("#######Epoch {}#######".format(epoch))
-        loss_epoch = train(train_loader, model, optimizer, ir_idx, noise_idx, args.sr)
+        loss_epoch = train(train_loader, model, optimizer, ir_idx, noise_idx, args.sr, augment)
         hit_rates = validate(query_loader, dummy_loader, augment, model, output_root_dir)
         loss_log.append(loss_epoch)
         hit_rate_log.append(hit_rates[0])
