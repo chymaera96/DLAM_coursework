@@ -60,11 +60,11 @@ class GPUTransformNeuralfp(nn.Module):
         else:
             print(x_i.shape)
             X_i = self.logmelspec(x_i).permute(2,0,1)
-            X_i = X_i.unfold(0, size=self.n_frames, step=self.n_frames//2).permute(1,0,3,2)
+            X_i = X_i.unfold(0, size=self.n_frames, step=self.n_frames//2).permute(0,1,3,2)
 
-            x_j = self.val_transform(x_j, sample_rate=self.sample_rate)
+            x_j = self.val_transform(x_j.squeeze(0), sample_rate=self.sample_rate)
             X_j = self.logmelspec(x_j).permute(2,0,1)
-            X_j = X_j.unfold(0, size=self.n_frames, step=self.n_frames//2).permute(1,0,3,2)
+            X_j = X_j.unfold(0, size=self.n_frames, step=self.n_frames//2).permute(0,1,3,2)
 
             
             return X_i, X_j
