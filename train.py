@@ -133,8 +133,13 @@ def main():
     print(noise_dir)
     # assert data_dir == os.path.join(root,"data/fma_8000")
 
-    print("Loading dataset...")
+    print("Intializing augmentation pipeline...")
+    noise_idx = load_augmentation_index(noise_dir, splits=[0.6,0.2,0.2])["train"]
+    ir_idx = load_augmentation_index(ir_dir, splits=[0.6,0.2,0.2])["train"]
+    gpu_augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=args.sr).to(device)
     cpu_augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=args.sr, cpu=True)
+
+    print("Loading dataset...")
     train_dataset = NeuralfpDataset(path=train_dir, train=True, transform=cpu_augment)
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=batch_size, shuffle=True,
@@ -173,10 +178,6 @@ def main():
     model = SimCLR(encoder=SlowFastNetwork(ResidualUnit, layers=[1,1,1,1])).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max = 500, eta_min = 3e-5)
-    print("Intializing augmentation pipeline...")
-    noise_idx = load_augmentation_index(noise_dir, splits=[0.6,0.2,0.2])["train"]
-    ir_idx = load_augmentation_index(ir_dir, splits=[0.6,0.2,0.2])["train"]
-    gpu_augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=args.sr).to(device)
        
     if args.resume:
         if os.path.isfile(args.resume):
