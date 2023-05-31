@@ -41,21 +41,18 @@ class NeuralfpDataset(Dataset):
 
             print("Error loading:" + self.filenames[str(idx)])
             self.ignore_idx.append(idx)
-            # self.filenames.pop(str(idx))
             return self[idx+1]
 
         audio_mono = audio.mean(dim=0)
         if self.norm is not None:
             audio_mono = qtile_normalize(audio_mono, q=self.norm)
-        # print(f"audio length ----> {len(audioData)}")
         resampler = torchaudio.transforms.Resample(sr, SAMPLE_RATE)
-        audio_resampled = resampler(audio_mono)    # Downsampling
+        audio_resampled = resampler(audio_mono)    
 
         clip_frames = int(SAMPLE_RATE*clip_len)
         
         if len(audio_resampled) <= clip_frames:
             self.ignore_idx.append(idx)
-            # self.filenames.pop(str(idx))
             return self[idx + 1]
         
         #   For training pipeline, output a random frame of the audio
@@ -77,8 +74,8 @@ class NeuralfpDataset(Dataset):
         
         #   For validation / test, output consecutive (overlapping) frames
         else:
-            # return torch.unsqueeze(audio_resampled, 0)
-            return audio_resampled
+            return torch.unsqueeze(audio_resampled, 0)
+            # return audio_resampled
     
     def __len__(self):
         return len(self.filenames)
