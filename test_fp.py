@@ -44,9 +44,9 @@ def create_fp_db(dataloader, augment, model, output_root_dir, verbose=True):
     print("=> Creating query and db fingerprints...")
     for idx, audio in enumerate(dataloader):
         audio = audio.to(device)
-        db, q = augment(audio, audio)
-        x_i = torch.unsqueeze(db[0],1)
-        x_j = torch.unsqueeze(q[0],1)
+        x_i, x_j = augment(audio, audio)
+        # x_i = torch.unsqueeze(db[0],1)
+        # x_j = torch.unsqueeze(q[0],1)
         with torch.no_grad():
             _, _, z_i, z_j= model(x_i,x_j)        
 
@@ -88,8 +88,8 @@ def create_dummy_db(dataloader, augment, model, output_root_dir, fname='dummy_db
     print("=> Creating dummy fingerprints...")
     for idx, audio in enumerate(dataloader):
         audio = audio.to(device)
-        db, q = augment(audio, audio)
-        x_i = torch.unsqueeze(db[0],1)
+        x_i, _ = augment(audio, audio)
+        # x_i = torch.unsqueeze(db[0],1)
         with torch.no_grad():
             _, _, z_i, _= model(x_i,x_i)        
 
