@@ -9,6 +9,7 @@ def get_index(index_type,
               train_data,
               train_data_shape,
               use_gpu=True,
+              n_centroids=64,
               max_nitem_train=2e7):
     """
     • Create FAISS index
@@ -62,7 +63,6 @@ def get_index(index_type,
     elif mode == 'ivfpq':
         # Using IVF-PQ index
         code_sz = 64 # power of 2
-        n_centroids = 256
         nbits = 8  # nbits must be 8, 12 or 16, The dimension d should be a multiple of M.
         index = faiss.IndexIVFPQ(index, d, n_centroids, code_sz, nbits)
     elif mode == 'ivfpq-rr':
@@ -164,6 +164,7 @@ def eval_faiss(emb_dir,
                test_ids='icassp',
                test_seq_len='1 3 5 9 11 19',
                k_probe=20,
+               n_centroids=64,
                display_interval=5):
     """
     Segment/sequence-wise audio search experiment and evaluation: implementation based on FAISS.
@@ -192,7 +193,7 @@ def eval_faiss(emb_dir,
     ---------------------------------------------------------------------- """
     # Create and train FAISS index
     index = get_index(index_type, dummy_db, dummy_db.shape, (not nogpu),
-                      max_train)
+                      max_train, n_centroids=n_centroids)
 
     # Add items to index
     start_time = time.time()
