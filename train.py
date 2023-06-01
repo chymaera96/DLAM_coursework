@@ -130,8 +130,6 @@ def main():
     random_seed = 42
     shuffle_dataset = True
 
-    print(f"Number of steps per epoch {load_index(train_dir)}")
-
     # assert data_dir == os.path.join(root,"data/fma_8000")
 
     print("Intializing augmentation pipeline...")
