@@ -7,7 +7,7 @@ import torch.nn.functional as F
 from torch.utils.data.sampler import SubsetRandomSampler
 
 
-from util import load_ckp, save_ckp, load_augmentation_index, create_fp_dir
+from util import load_ckp, save_ckp, load_augmentation_index, create_fp_dir, load_index
 from sfnet.gpu_transformations import GPUTransformNeuralfp
 from sfnet.data_sans_transforms import NeuralfpDataset
 from sfnet.modules.simclr import SimCLR
@@ -130,8 +130,8 @@ def main():
     random_seed = 42
     shuffle_dataset = True
 
-    print(ir_dir)
-    print(noise_dir)
+    print(f"Number of steps per epoch {load_index(train_dir)}")
+
     # assert data_dir == os.path.join(root,"data/fma_8000")
 
     print("Intializing augmentation pipeline...")
