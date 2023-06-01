@@ -130,6 +130,8 @@ def main():
     random_seed = 42
     shuffle_dataset = True
 
+    print(f"Size of train index file {len(load_index(train_dir))}")
+
     # assert data_dir == os.path.join(root,"data/fma_8000")
 
     print("Intializing augmentation pipeline...")
