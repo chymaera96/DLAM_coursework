@@ -9,8 +9,9 @@ def get_index(index_type,
               train_data,
               train_data_shape,
               use_gpu=True,
+              max_nitem_train=2e7,
               n_centroids=64,
-              max_nitem_train=2e7):
+):
     """
     • Create FAISS index
     • Train index using (partial) data
@@ -164,8 +165,7 @@ def eval_faiss(emb_dir,
                test_ids='icassp',
                test_seq_len='1 3 5 9 11 19',
                k_probe=20,
-               n_centroids=64,
-               display_interval=5):
+               n_centroids=64):
     """
     Segment/sequence-wise audio search experiment and evaluation: implementation based on FAISS.
     """
