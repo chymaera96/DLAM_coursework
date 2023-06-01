@@ -14,7 +14,7 @@ def load_index(data_dir, ext=['wav','mp3']):
     if not os.path.exists(json_path):
         idx = 0
         for fpath in glob.iglob(os.path.join(data_dir,'**/*.*'), recursive=True):
-            if fpath.split('.')[-1] in ext and idx: 
+            if fpath.split('.')[-1] in ext: 
                 dataset[str(idx)] = fpath
                 idx += 1
 
