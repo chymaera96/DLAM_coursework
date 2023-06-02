@@ -201,8 +201,7 @@ def main():
 
 
     print("Calculating initial loss ...")
-    best_loss = train(train_loader, model, optimizer, ir_train_idx, noise_train_idx, args.sr, gpu_augment)
-
+    best_loss = float('inf')
     # training
     model.train()
     for epoch in range(start_epoch+1, num_epochs+1):
