@@ -111,7 +111,7 @@ def get_index(index_type,
     print('Elapsed time: {:.2f} seconds.'.format(time.time() - start_time))
 
     # N probe
-    index.nprobe = 40
+    index.nprobe = 20
     return index
 
 
