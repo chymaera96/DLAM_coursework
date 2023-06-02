@@ -193,7 +193,7 @@ def eval_faiss(emb_dir,
     ---------------------------------------------------------------------- """
     # Create and train FAISS index
     index = get_index(index_type, dummy_db, dummy_db.shape, (not nogpu),
-                      max_train, n_centroids=64)
+                      max_train, n_centroids=32)
 
     # Add items to index
     start_time = time.time()
