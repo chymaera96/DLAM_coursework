@@ -24,8 +24,8 @@ class GPUTransformNeuralfp(nn.Module):
             ])
         
         self.val_transform = Compose([
-            ApplyImpulseResponse(ir_paths=self.ir_dir, p=0.5),
-            AddBackgroundNoise(background_paths=noise_dir, min_snr_in_db=0, max_snr_in_db=10,p=0.8),
+            ApplyImpulseResponse(ir_paths=self.ir_dir, p=1),
+            AddBackgroundNoise(background_paths=noise_dir, min_snr_in_db=0, max_snr_in_db=10,p=1),
             ])
         
         self.logmelspec = nn.Sequential(
