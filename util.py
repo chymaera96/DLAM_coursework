@@ -74,7 +74,7 @@ def load_ckp(checkpoint_fpath, model, optimizer, scheduler):
     model.load_state_dict(checkpoint['state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer'])
     scheduler.load_state_dict(checkpoint['scheduler'])
-    return model, optimizer, scheduler, checkpoint['epoch'], checkpoint['loss']
+    return model, optimizer, scheduler, checkpoint['epoch'], checkpoint['loss'], checkpoint['valid_acc']
 
 def save_ckp(state,epoch,model_name,model_folder):
     if not os.path.exists(model_folder): 
