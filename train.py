@@ -74,7 +74,7 @@ def ntxent_loss(z_i, z_j, tau=0.05):
 
 def train(train_loader, model, optimizer, ir_idx, noise_idx, sr, augment=None):
     loss_epoch = 0
-    # return loss_epoch
+    return loss_epoch
     if augment is None:
         augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=sr).to(device)
 
