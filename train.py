@@ -130,6 +130,8 @@ def main():
     model_name = args.ckp
     random_seed = 42
     shuffle_dataset = True
+    gc.collect()
+    torch.cuda.empty_cache()
 
     print(f"Size of train index file {len(load_index(train_dir))}")
     print(f"Size of validation index file {len(load_index(valid_dir))}")
