@@ -31,7 +31,6 @@ def load_index(data_dir, ext=['wav','mp3']):
 def load_augmentation_index(data_dir, splits, ext=['wav','mp3'], shuffle_dataset=True):
     dataset = {'train' : [], 'test' : [], 'validate': []}
     json_path = os.path.join(data_dir, data_dir.split('/')[-1] + ".json")
-    print(f"Erroneous path : {json_path}")
     if not os.path.exists(json_path):
         fpaths = glob.glob(os.path.join(data_dir,'**/*.*'), recursive=True)
         fpaths = [p for p in fpaths if p.split('.')[-1] in ext]
