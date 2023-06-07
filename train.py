@@ -84,7 +84,8 @@ def train(train_loader, model, optimizer, ir_idx, noise_idx, sr, augment=None):
         optimizer.zero_grad()
         x_i = x_i.to(device)
         x_j = x_j.to(device)
-        x_i, x_j = augment(x_i, x_j)
+        with torch.no_grad():
+            x_i, x_j = augment(x_i, x_j)
         # print(f"Output from augmenter x_i, x_j {x_i.shape} {x_j.shape}")
 
         # positive pair, with encoding
@@ -146,7 +147,7 @@ def main():
     val_augment = GPUTransformNeuralfp(ir_dir=ir_val_idx, noise_dir=noise_val_idx, sample_rate=args.sr, train=False).to(device)
 
     print("Loading dataset...")
-    train_dataset = NeuralfpDataset(path=train_dir, train=True, transform=cpu_augment)
+    train_dataset = NeuralfpDataset(path=train_dir, train=True, transform=None)
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=batch_size, shuffle=True,
         num_workers=8, pin_memory=True, drop_last=True)
