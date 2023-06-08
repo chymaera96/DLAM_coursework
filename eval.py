@@ -163,7 +163,7 @@ def eval_faiss(emb_dir,
                nogpu=False,
                max_train=1e7,
                test_ids='icassp',
-               test_seq_len='1 3 5 9 11 19',
+               test_seq_len='1 3 5 9 14',
                k_probe=20,
                n_centroids=64):
     """

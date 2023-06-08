@@ -5,6 +5,7 @@ import torch
 import gc
 import torch.nn.functional as F
 from torch.utils.data.sampler import SubsetRandomSampler
+from torch.utils.tensorboard import SummaryWriter
 
 
 from util import load_ckp, save_ckp, load_augmentation_index, create_fp_dir, load_index
@@ -74,7 +75,7 @@ def ntxent_loss(z_i, z_j, tau=0.05):
 
 def train(train_loader, model, optimizer, ir_idx, noise_idx, sr, augment=None):
     loss_epoch = 0
-    return loss_epoch
+    # return loss_epoch
     if augment is None:
         augment = GPUTransformNeuralfp(ir_dir=ir_idx, noise_dir=noise_idx, sample_rate=sr).to(device)
 
@@ -108,7 +109,7 @@ def train(train_loader, model, optimizer, ir_idx, noise_idx, sr, augment=None):
 def validate(query_loader, dummy_loader, augment, model, output_root_dir):
     create_dummy_db(dummy_loader, augment=augment, model=model, output_root_dir=output_root_dir, verbose=False)
     create_fp_db(query_loader, augment=augment, model=model, output_root_dir=output_root_dir, verbose=False)
-    hit_rates = eval_faiss(emb_dir=output_root_dir, test_ids='all', n_centroids=16)
+    hit_rates = eval_faiss(emb_dir=output_root_dir, test_ids='all', n_centroids=64)
     print("-------Validation hit-rates-------")
     print(f'Top-1 exact hit rate = {hit_rates[0]}')
     print(f'Top-1 near hit rate = {hit_rates[1]}')
@@ -116,6 +117,7 @@ def validate(query_loader, dummy_loader, augment, model, output_root_dir):
 
 def main():
     args = parser.parse_args()
+    writer = SummaryWriter()
     data_dir = args.data_dir
     train_dir = os.path.join(data_dir, 'train')
     valid_dir = os.path.join(data_dir, 'valid')
@@ -210,10 +212,15 @@ def main():
     for epoch in range(start_epoch+1, num_epochs+1):
         print("#######Epoch {}#######".format(epoch))
         loss_epoch = train(train_loader, model, optimizer, ir_train_idx, noise_train_idx, args.sr, gpu_augment)
+        writer.add_scalar("Loss/train", loss_epoch, epoch)
         loss_log.append(loss_epoch)
         output_root_dir = create_fp_dir(ckp=args.ckp, epoch=epoch)
         hit_rates = validate(query_loader, dummy_loader, val_augment, model, output_root_dir)
         hit_rate_log.append(hit_rates[0])
+        writer.add_scalar("Exact Hit_rate (2 sec)", hit_rates[0][0], epoch)
+        writer.add_scalar("Exact Hit_rate (4 sec)", hit_rates[0][1], epoch)
+        writer.add_scalar("Near Hit_rate (2 sec)", hit_rates[1][0], epoch)
+
         if loss_epoch < best_loss:
             best_loss = loss_epoch
             
