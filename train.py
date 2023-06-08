@@ -117,7 +117,7 @@ def validate(query_loader, dummy_loader, augment, model, output_root_dir):
 
 def main():
     args = parser.parse_args()
-    writer = SummaryWriter()
+    writer = SummaryWriter(f'runs/{args.ckp}')
     data_dir = args.data_dir
     train_dir = os.path.join(data_dir, 'train')
     valid_dir = os.path.join(data_dir, 'valid')
